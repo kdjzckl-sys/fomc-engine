@@ -1,0 +1,226 @@
+# A hawkish / dovish lexicon for FOMC statement language.
+#
+# METHOD, AND WHAT IS AND IS NOT BORROWED
+# ---------------------------------------
+# The *construction* is Apel & Blix Grimaldi's: a central-bank sentence is not
+# scored by counting loaded words, it is scored by pairing a DIRECTION word with
+# an OBJECT word inside a short window. "inflation" alone says nothing -- it is
+# in every statement ever written. "inflation has moderated" and "inflation has
+# picked up" say opposite things, and only the pair carries the sign.
+#
+#   Apel, M. and Blix Grimaldi, M. (2012), "The information content of central
+#   bank minutes", Sveriges Riksbank Working Paper Series No. 261.
+#   https://www.riksbank.se/en-gb/press-and-published/publications/working-paper-series/
+#
+# The *terms below are not a reproduction of that paper's appendix*, and this
+# file does not pretend they are. They are the direction and object vocabulary
+# the FOMC actually uses, read off the statement corpus this package fetches
+# (246 statements, 1994-2026). Saying otherwise would be a citation that cannot
+# be checked, which is the thing this repo exists not to do.
+#
+# THE INVERSION THAT MOST LEXICONS GET WRONG
+# ------------------------------------------
+# Slack is signed the other way. "inflation rose" is hawkish; "unemployment
+# rose" is dovish. A flat object list scores both as hawkish and is then
+# systematically wrong about every labour-market sentence in a cutting cycle --
+# which is exactly the sentence that matters. [object.slack] carries the flip.
+#
+# SCORING
+# -------
+#   hawkish hit = up-word   within WINDOW tokens of a price/activity object
+#               | down-word within WINDOW tokens of a slack object
+#               | up-word   within WINDOW tokens of a policy object
+#   dovish  hit = the mirror of each.
+# WINDOW is set in lexicon.py, not here, so this file stays pure data.
+#
+# NEGATION is handled in lexicon.py by flipping a hit when a negator ("not",
+# "no", "little", "unlikely") sits between the direction word and the object.
+#
+# READ THE COVERAGE NOTE BEFORE USING THE OUTPUT. The score is reported with
+# what it is actually worth measured against the decision, and the measurement
+# is not flattering.
+
+[direction.up]
+raise
+raises
+raised
+raising
+rise
+rises
+rising
+risen
+increase
+increases
+increased
+increasing
+higher
+high
+elevated
+accelerate
+accelerated
+accelerating
+acceleration
+firm
+firmer
+firming
+tighten
+tightened
+tightening
+tighter
+strengthen
+strengthened
+strengthening
+stronger
+strong
+robust
+solid
+upside
+upward
+overheating
+pickup
+picked
+above
+exceed
+exceeded
+persistent
+persistently
+restrictive
+restraint
+boost
+expand
+expanding
+expanded
+rapid
+rapidly
+
+[direction.down]
+lower
+lowered
+lowering
+cut
+cuts
+reduce
+reduces
+reduced
+reducing
+reduction
+decline
+declined
+declining
+decrease
+decreased
+decreasing
+ease
+eased
+easing
+easier
+weaken
+weakened
+weakening
+weaker
+weak
+slow
+slowed
+slowing
+slower
+soften
+softened
+softening
+soft
+subdued
+moderate
+moderated
+moderating
+moderation
+diminish
+diminished
+diminishing
+downside
+downward
+below
+accommodative
+accommodation
+sluggish
+contraction
+contracted
+deteriorate
+deteriorated
+restrained
+damp
+damped
+cooled
+cooling
+fell
+fallen
+falling
+drop
+dropped
+
+[object.price]
+inflation
+inflationary
+price
+prices
+pce
+disinflation
+cost
+costs
+deflation
+
+[object.activity]
+activity
+growth
+grow
+output
+gdp
+production
+spending
+demand
+consumption
+investment
+employment
+payrolls
+hiring
+job
+jobs
+expansion
+sales
+income
+exports
+housing
+
+[object.slack]
+unemployment
+unemployed
+jobless
+slack
+underutilization
+layoffs
+
+# NOTE: bare "rate" and "rates" are deliberately ABSENT. "the unemployment
+# rate has risen" would otherwise pair "risen" with the policy object "rate"
+# and score hawkish, when the sentence is the single most dovish thing the
+# statement can say. "target", "range", "funds", "policy" and "stance" carry
+# every policy reference in the corpus without that collision.
+[object.policy]
+policy
+stance
+target
+range
+funds
+accommodation
+restraint
+balance
+purchases
+holdings
+
+[negator]
+not
+no
+nor
+little
+unlikely
+without
+never
+neither
+unchanged

@@ -102,7 +102,7 @@ def api_key() -> str:
     k = os.environ.get("FRED_API_KEY", "").strip()
     if k:
         return k
-    root = HERE.parents[1]  # engine/ -> repo root
+    root = HERE.parent  # engine/ -> repo root
     for base in (root, HERE):
         for name in (".env.local", ".env"):
             k = _read_env_file(base / name, "FRED_API_KEY") or ""

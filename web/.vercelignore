@@ -1,0 +1,11 @@
+# The engine itself never ships. It needs Python, a FRED key and the cached
+# series in engine/data — none of which exist on a serverless host. The
+# dashboard reads data/snapshot.json instead (see scripts/snapshot.mjs).
+../engine
+
+.next
+node_modules
+tsconfig.tsbuildinfo
+*.log
+.env
+.env.*

@@ -1,98 +1,227 @@
 // @ts-check
-// Run: node --test lib/fedSubset.test.mjs
+// Run: node --test lib/*.test.mjs
 //
-// The first block is a straight port of the fixture in
-// `os/auctus/rates/test_rates.py::_record` — same five rows, same expected
-// splits (model 1/3, momentum 2/3, curve proxy 3/3). It is duplicated here on
-// purpose: /fed and /rates now both quote move-subset baselines, and if the
-// TypeScript read ever drifts from `differential.py::subset_baselines` the two
-// dashboards will print different numbers off the same backtest.json. This test
-// is the thing that fails first when that happens.
+// WHAT THESE TESTS PIN, AND WHY IT IS DIFFERENT NOW
+// ------------------------------------------------
+// They used to check that this module's arithmetic matched a Python module that
+// computed the same move-subset baselines somewhere else. That was the wrong
+// property to pin: it made two independent derivations agree by testing, which
+// works right up until one of them is edited. There were three derivations —
+// `engine/backtest.py`, this file, and a downstream consumer — and they agreed
+// at 65.7534% / 91.7808% by luck until the artifact was regenerated mid-session.
 //
-// The second block is the defensive contract. The FOMC engine's Python is under
-// active development, so these assert that new keys are ignored, missing keys
-// degrade rather than throw, and a shape we have never seen returns null.
+// The engine publishes the table now. So the property worth pinning is the one
+// that was missing: THE DASHBOARD REPORTS EXACTLY WHAT THE ENGINE PUBLISHED. No
+// recomputation, no fallback to deriving from `preds`, no arithmetic of our own
+// that could drift. The load-bearing test is "published values win even when the
+// rows sitting next to them imply something else" — if this module ever starts
+// computing again, that is the test that fails.
+//
+// The second property is structural: recall and the false-alarm rate that bought
+// it are never separable. A row carrying one and not the other is dropped rather
+// than rendered, because 91.8% read without its 45.6% is how a trigger-happy
+// yield spread gets mistaken for a better forecaster than the model.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { calibrationRead, coefficients, moveSubset } from "./fedSubset.mjs";
 
-/** The `os/auctus/rates/test_rates.py` fixture, row for row. */
-const PREDS = [
-  // 3 moves: model 1/3, momentum 2/3, curve proxy 3/3.
-  { actual: 1, pred: 0, prev_label: 1, mkt_1y: 0.9 },
-  { actual: -1, pred: -1, prev_label: -1, mkt_1y: -0.9 },
-  { actual: 1, pred: -1, prev_label: 0, mkt_1y: 0.9 },
-  // holds, which must not enter any move-subset figure
-  { actual: 0, pred: 0, prev_label: 0, mkt_1y: 0.0 },
-  { actual: 0, pred: 0, prev_label: 0, mkt_1y: 0.0 },
-];
+const near = (/** @type {number | null} */ a, /** @type {number} */ b) =>
+  assert.ok(a !== null && Math.abs(a - b) < 1e-12, `${a} !== ${b}`);
 
-const near = (/** @type {number} */ a, /** @type {number} */ b) =>
-  assert.ok(Math.abs(a - b) < 1e-9, `${a} !== ${b}`);
+/**
+ * A published `move_subset` block, shaped exactly as `engine/backtest.py` writes
+ * it. The move-subset figures are the fixture in `engine/test_subset.py`
+ * (model 1/3, repeat-last 2/3, curve proxy 3/3), so a change to the engine's
+ * arithmetic shows up in that suite and a change to this reader shows up here.
+ */
+function published(overrides = {}) {
+  return {
+    n: 5,
+    n_moves: 3,
+    n_holds: 2,
+    futures_band_bp: 12.5,
+    note: "Recall and false alarms are one record per caller.",
+    rows: [
+      { key: "model", label: "this model", n: 5, n_moves: 3, n_holds: 2,
+        all_direction: 0.6, move_direction: 1 / 3, hold_false_alarm: 0, move_5class: 1 / 3 },
+      { key: "always_hold", label: "always say hold", n: 5, n_moves: 3, n_holds: 2,
+        all_direction: 0.4, move_direction: 0, hold_false_alarm: 0, move_5class: null },
+      { key: "repeat_last", label: "repeat the last action", n: 5, n_moves: 3, n_holds: 2,
+        all_direction: 0.8, move_direction: 2 / 3, hold_false_alarm: 0, move_5class: null },
+      { key: "market_proxy", label: "market-implied (1y - funds proxy)", n: 5, n_moves: 3, n_holds: 2,
+        all_direction: 1, move_direction: 1, hold_false_alarm: 0, move_5class: null },
+      { key: "market_futures", label: "market-implied (fed funds futures)", n: 4, n_moves: 2, n_holds: 2,
+        all_direction: 0.75, move_direction: 1, hold_false_alarm: 0.5, move_5class: null },
+    ],
+    like_for_like: {
+      basis: "market_futures",
+      n: 4,
+      n_moves: 2,
+      n_holds: 2,
+      rows: [
+        { key: "model", label: "this model", n: 4, n_moves: 2, n_holds: 2,
+          all_direction: 0.75, move_direction: 0.5, hold_false_alarm: 0, move_5class: 0.5 },
+        { key: "market_futures", label: "market-implied (fed funds futures)", n: 4, n_moves: 2, n_holds: 2,
+          all_direction: 0.75, move_direction: 1, hold_false_alarm: 0.5, move_5class: null },
+      ],
+    },
+    ...overrides,
+  };
+}
 
-test("holds never enter a move-subset figure", () => {
-  const s = moveSubset(PREDS);
+/** The whole artifact, as `models/backtest.json` parses. */
+const ARTIFACT = {
+  n: 5,
+  accuracy_direction: 0.6,
+  baseline_futures_direction: 0.75,
+  baseline_futures_n: 4,
+  move_subset: published(),
+  preds: [
+    { actual: 1, pred: 0, prev_label: 1, mkt_1y: 0.9 },
+    { actual: -1, pred: -1, prev_label: -1, mkt_1y: -0.9 },
+    { actual: 1, pred: -1, prev_label: 0, mkt_1y: 0.9 },
+    { actual: 0, pred: 0, prev_label: 0, mkt_1y: 0.0 },
+    { actual: 0, pred: 0, prev_label: 0, mkt_1y: 0.0 },
+  ],
+};
+
+/* ── the property this file exists for ───────────────────────────────────── */
+
+test("the dashboard reports exactly what the engine published", () => {
+  const s = moveSubset(ARTIFACT);
   assert.ok(s);
-  assert.equal(s.n_moves, 3);
-});
-
-test("the three baselines match differential.py on the shared fixture", () => {
-  const s = /** @type {NonNullable<ReturnType<typeof moveSubset>>} */ (moveSubset(PREDS));
   near(s.model, 1 / 3);
   near(s.momentum, 2 / 3);
   near(s.curve_proxy, 1);
-});
-
-test("always-hold scores exactly zero on moves, by construction", () => {
-  const s = /** @type {NonNullable<ReturnType<typeof moveSubset>>} */ (moveSubset(PREDS));
   near(s.always_hold, 0);
+  assert.equal(s.n_moves, 3);
+  assert.equal(s.n_holds, 2);
 });
 
-test("the curve proxy's dead band is +/-0.15, not sign(mkt_1y)", () => {
-  // Inside the band the curve is not calling a move. If the band were dropped,
-  // a +0.10 spread would score as a correct hike call and the proxy's number
-  // would be inflated — which is the direction of error that flatters us.
-  const s = /** @type {NonNullable<ReturnType<typeof moveSubset>>} */ (
-    moveSubset([{ actual: 1, pred: 1, prev_label: 0, mkt_1y: 0.1 }])
-  );
-  near(s.curve_proxy, 0);
-  near(s.model, 1);
+test("published numbers win over anything the rows beside them would imply", () => {
+  // The same artifact, but the engine published figures that do NOT match what
+  // recomputing from `preds` would give. A reader that still derives fails here
+  // and only here — which is the whole point of the test.
+  const drifted = {
+    ...ARTIFACT,
+    move_subset: published({
+      rows: published().rows.map((r) =>
+        r.key === "model" ? { ...r, move_direction: 0.4242, hold_false_alarm: 0.1337 } : r,
+      ),
+    }),
+  };
+  const s = /** @type {NonNullable<ReturnType<typeof moveSubset>>} */ (moveSubset(drifted));
+  near(s.model, 0.4242);
+  near(s.model_false_alarm, 0.1337);
 });
 
-test("a missing mkt_1y reads as no call, not as a crash", () => {
-  const s = /** @type {NonNullable<ReturnType<typeof moveSubset>>} */ (
-    moveSubset([{ actual: 1, pred: 1, prev_label: 1 }])
-  );
-  near(s.curve_proxy, 0);
-  near(s.momentum, 1);
+test("an artifact with only preds reads as not scored, never as a second opinion", () => {
+  // Deriving the subset here is the thing that was removed. A pre-move_subset
+  // backtest.json must render "not scored" rather than quietly producing a
+  // number the CLI would disagree with.
+  assert.equal(moveSubset({ preds: ARTIFACT.preds }), null);
+  assert.equal(moveSubset(ARTIFACT.preds), null);
 });
 
-test("50bp moves count as one directional move, not two", () => {
-  // `actual` is an ordinal class (-2..2), so sign() — not equality — is what
-  // makes a cut50 and a cut25 both count as "the Fed eased".
-  const s = /** @type {NonNullable<ReturnType<typeof moveSubset>>} */ (
-    moveSubset([{ actual: -2, pred: -1, prev_label: -2, mkt_1y: -0.9 }])
-  );
-  near(s.model, 1);
+/* ── recall and its price are inseparable ────────────────────────────────── */
+
+test("every rendered row carries recall AND the false alarms it cost", () => {
+  const s = /** @type {NonNullable<ReturnType<typeof moveSubset>>} */ (moveSubset(ARTIFACT));
+  for (const r of s.rows) {
+    assert.ok("move_direction" in r && "hold_false_alarm" in r, r.key);
+    assert.equal(r.move_direction === null, r.hold_false_alarm === null);
+  }
+  // The pair that makes the curve proxy readable: 100% of moves called, but it
+  // false-alarmed on holds to get there. Both come off the same record.
   near(s.curve_proxy, 1);
+  assert.notEqual(s.curve_proxy_false_alarm, null);
 });
 
-test("no moves, no preds, and junk all return null rather than 0%", () => {
-  // A subset of zero rows must not render as "the model got 0% right".
-  assert.equal(moveSubset([{ actual: 0, pred: 0, prev_label: 0, mkt_1y: 0 }]), null);
-  assert.equal(moveSubset([]), null);
-  assert.equal(moveSubset(null), null);
-  assert.equal(moveSubset({ preds: [] }), null);
+test("a row carrying recall without its false-alarm rate is dropped, not shown", () => {
+  const half = published({
+    rows: published().rows.map((r) =>
+      r.key === "repeat_last" ? { ...r, hold_false_alarm: null } : r,
+    ),
+  });
+  const s = /** @type {NonNullable<ReturnType<typeof moveSubset>>} */ (
+    moveSubset({ move_subset: half })
+  );
+  assert.equal(s.rows.find((r) => r.key === "repeat_last"), undefined);
+  assert.equal(s.momentum, null);
+  // and the rows that were whole still render
+  near(s.model, 1 / 3);
 });
+
+test("the read is null when the model or the proxy row is missing", () => {
+  // With one of the two gone there is no comparison to draw, and a half-drawn
+  // ladder is worse than an honest "not scored".
+  for (const drop of ["model", "market_proxy"]) {
+    const s = moveSubset({
+      move_subset: published({ rows: published().rows.filter((r) => r.key !== drop) }),
+    });
+    assert.equal(s, null, drop);
+  }
+});
+
+/* ── the futures baseline and its coverage ───────────────────────────────── */
+
+test("the futures baseline arrives whole, with the coverage it was scored on", () => {
+  const s = /** @type {NonNullable<ReturnType<typeof moveSubset>>} */ (moveSubset(ARTIFACT));
+  assert.ok(s.futures);
+  assert.equal(s.futures.n, 4); // fewer than the 5 the other rows cover
+  near(s.futures.move_direction, 1);
+  near(s.futures.hold_false_alarm, 0.5);
+  near(s.futures_band_bp, 12.5);
+});
+
+test("a scorecard with no futures row reads null there rather than borrowing the proxy", () => {
+  const s = /** @type {NonNullable<ReturnType<typeof moveSubset>>} */ (
+    moveSubset({
+      move_subset: published({
+        rows: published().rows.filter((r) => r.key !== "market_futures"),
+        like_for_like: null,
+      }),
+    })
+  );
+  assert.equal(s.futures, null);
+  assert.equal(s.like_for_like, null);
+  near(s.curve_proxy, 1); // the proxy is still itself, and still labelled as itself
+});
+
+test("the like-for-like table comes through with its own denominator", () => {
+  const s = /** @type {NonNullable<ReturnType<typeof moveSubset>>} */ (moveSubset(ARTIFACT));
+  assert.ok(s.like_for_like);
+  assert.equal(s.like_for_like.n, 4);
+  assert.equal(s.like_for_like.rows.length, 2);
+  near(s.like_for_like.rows[0].move_direction, 0.5);
+});
+
+/* ── defensive contract ──────────────────────────────────────────────────── */
 
 test("unknown keys from a newer engine are ignored, not fatal", () => {
   const s = /** @type {NonNullable<ReturnType<typeof moveSubset>>} */ (
-    moveSubset([
-      { actual: 1, pred: 1, prev_label: 1, mkt_1y: 0.9, futures_implied: 0.8, ff1: 4.25 },
-    ])
+    moveSubset({
+      move_subset: published({ some_new_block: { anything: 1 } }),
+      another_new_top_level_key: [1, 2, 3],
+    })
   );
-  near(s.model, 1);
-  near(s.curve_proxy, 1);
+  near(s.model, 1 / 3);
+});
+
+test("junk, empties and malformed shapes all return null rather than 0%", () => {
+  assert.equal(moveSubset(null), null);
+  assert.equal(moveSubset(undefined), null);
+  assert.equal(moveSubset({}), null);
+  assert.equal(moveSubset({ move_subset: {} }), null);
+  assert.equal(moveSubset({ move_subset: { rows: [] } }), null);
+  assert.equal(moveSubset({ move_subset: { rows: "not an array" } }), null);
+  assert.equal(moveSubset("backtest.json"), null);
+});
+
+test("the move_subset block on its own is accepted, for a caller that already unwrapped it", () => {
+  const s = moveSubset(published());
+  assert.ok(s);
+  near(s.model, 1 / 3);
 });
 
 /* ── calibration ──────────────────────────────────────────────────────────── */

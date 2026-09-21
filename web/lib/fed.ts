@@ -20,11 +20,14 @@
  */
 import fs from "node:fs/promises";
 import path from "node:path";
+import snapshot from "../data/snapshot.json";
 import { calibrationRead, coefficients, moveSubset } from "./fedSubset.mjs";
 import type {
   CalibrationRead,
   Coefficient,
+  LikeForLike,
   MoveSubset,
+  SubsetRow,
 } from "./fedSubset.d.mts";
 
 /**
@@ -40,7 +43,7 @@ function repoRoot(): string {
   return process.env.FOMC_ENGINE_ROOT || path.resolve(process.cwd(), "..");
 }
 
-export type { CalibrationRead, Coefficient, MoveSubset };
+export type { CalibrationRead, Coefficient, LikeForLike, MoveSubset, SubsetRow };
 
 export interface Driver {
   feature: string;
@@ -86,8 +89,18 @@ export interface Score {
   log_loss: number;
   brier: number;
   baseline_always_hold: number;
+  /** The 1y-minus-funds YIELD SPREAD standing in for the market. A proxy. */
   baseline_market_direction: number;
   baseline_persistence: number;
+  /**
+   * The real one: the CME ZQ strip through the FedWatch arithmetic, scored only
+   * on the meetings it reaches. `baseline_futures_n` is that coverage and is not
+   * decoration -- the strip cannot price 37 late-month meetings, and those are
+   * null here rather than quietly falling back to the spread above.
+   */
+  baseline_futures_direction: number | null;
+  baseline_futures_n: number | null;
+  baseline_futures_band_bp: number | null;
   n_moves: number;
   move_accuracy_direction: number;
   move_accuracy_5class: number;
@@ -124,15 +137,50 @@ export interface FedBundle {
   ablation: { label: string; accuracy_direction: number; log_loss: number }[] | null;
   missing: string | null;
   asOf: string;
+  /**
+   * Where these numbers came from.
+   *
+   * "live" — the Python engine ran just now against the cached FRED series.
+   * "snapshot" — the engine is not reachable (no Python, no repo root: a
+   * serverless host), so the bundle is the frozen `data/snapshot.json`. The UI
+   * MUST render `generatedAt` alongside the forecast in that case. A frozen
+   * prediction served as if it were live is the same class of error as quoting
+   * an accuracy figure without its baseline.
+   */
+  source: "live" | "snapshot";
+  /** When the snapshot was frozen. Null on a live read. */
+  generatedAt: string | null;
+}
+
+/**
+ * True when the Python engine is not reachable from this process.
+ *
+ * Set by the first failed `runCli` and read when the bundle is assembled, so a
+ * bundle reports one coherent provenance instead of a live forecast stitched to
+ * snapshot baselines. It does NOT gate the artifact reads in the same bundle —
+ * those run concurrently with the CLI call in `Promise.all` and fall back on
+ * their own missing-file path. It is a latch, never reset: a host without
+ * Python does not grow one mid-process.
+ */
+let engineUnreachable = false;
+
+type SnapshotArtifacts = Record<string, unknown>;
+
+function fromSnapshot<T>(rel: string): T | null {
+  const artifacts = (snapshot as { artifacts?: SnapshotArtifacts }).artifacts ?? {};
+  return (artifacts[rel] as T | undefined) ?? null;
 }
 
 async function readJson<T>(repo: string, rel: string): Promise<T | null> {
+  if (engineUnreachable) return fromSnapshot<T>(rel);
   try {
     return JSON.parse(await fs.readFile(path.join(repo, rel), "utf8")) as T;
   } catch {
     // A missing artifact is a real state ("never built"), not an error the
     // caller has to handle — the UI renders the gap and names the command.
-    return null;
+    // Off this box it is not a gap but a deployment fact, so fall back to the
+    // frozen artifact rather than rendering "never built" to the public.
+    return fromSnapshot<T>(rel);
   }
 }
 
@@ -158,8 +206,28 @@ async function runCli<T>(repo: string, args: string[], timeoutMs: number): Promi
     );
     return JSON.parse(stdout) as T;
   } catch {
-    return null;
+    // No Python, or no engine at this path. On this box that is a broken
+    // install; on a serverless host it is the normal case. Either way the
+    // frozen verb output is a better answer than null, and `source` tells the
+    // page which one it got.
+    engineUnreachable = true;
+    const frozen = snapshotVerb<T>(args);
+    return frozen;
   }
+}
+
+/**
+ * The frozen output of one CLI verb.
+ *
+ * Only the two verbs the dashboard actually calls are stored. An unrecognised
+ * verb returns null rather than guessing, so a new call site fails visibly here
+ * instead of silently rendering someone else's numbers.
+ */
+function snapshotVerb<T>(args: string[]): T | null {
+  const snap = snapshot as { forecast?: unknown; path?: unknown };
+  if (args[0] === "predict") return (snap.forecast as T | undefined) ?? null;
+  if (args[0] === "path") return (snap.path as T | undefined) ?? null;
+  return null;
 }
 
 /**
@@ -203,10 +271,13 @@ async function loadFed(): Promise<FedBundle> {
 
   const [forecast, backtest, current, decisions, tuning] = await Promise.all([
     runCli<Forecast>(repo, ["predict", "--json"], 60_000),
-    readJson<Score & { preds?: unknown; calibration?: CalibrationBin[] }>(
-      repo,
-      `${FOMC_DIR}/models/backtest.json`,
-    ),
+    readJson<
+      Score & {
+        preds?: unknown;
+        calibration?: CalibrationBin[];
+        move_subset?: unknown;
+      }
+    >(repo, `${FOMC_DIR}/models/backtest.json`),
     readJson<unknown>(repo, `${FOMC_DIR}/models/current.json`),
     readJson<{ decisions: Decision[] }>(repo, `${FOMC_DIR}/data/decisions.json`),
     readJson<{ ablation?: { label: string; accuracy_direction: number; log_loss: number }[] }>(
@@ -215,20 +286,35 @@ async function loadFed(): Promise<FedBundle> {
     ),
   ]);
 
-  // The backtest artifact carries every scored meeting. The dashboard needs the
-  // headline metrics, the calibration table, and the move-subset baselines
-  // derived from the rows; shipping 233 prediction objects on every poll is
-  // wasted bytes, so `preds` is reduced here and dropped.
+  // The backtest artifact carries every scored meeting plus the scorecard the
+  // engine computed off them. The move subset is READ here, not derived: it used
+  // to be recomputed in fedSubset.mjs from `preds`, in engine/backtest.py for the
+  // CLI, and a third time by a downstream consumer, and three derivations of one
+  // number drift. Shipping 233 prediction objects on every poll is wasted bytes,
+  // so `preds` is dropped once the reader has had the artifact, and `move_subset`
+  // is dropped from `score` because `moves` already carries it in full.
   let score: Score | null = null;
   let calibration: CalibrationBin[] | null = null;
   let reliability: CalibrationRead | null = null;
   let moves: MoveSubset | null = null;
   if (backtest) {
-    const { preds, calibration: cal, ...rest } = backtest;
-    score = rest as Score;
+    const cal = backtest.calibration;
+    // Everything except the three blocks that are either huge or already
+    // represented elsewhere in the bundle. Built by omission rather than by
+    // listing the keepers, so a metric the engine adds reaches the page without
+    // a change here.
+    const rest = { ...backtest } as Record<string, unknown>;
+    delete rest.preds;
+    delete rest.calibration;
+    delete rest.move_subset;
+    score = rest as unknown as Score;
     calibration = Array.isArray(cal) ? cal : null;
     reliability = calibrationRead(cal);
-    moves = moveSubset(preds);
+    // The whole artifact, because the scorecard is what is read. An artifact too
+    // old to carry `move_subset` returns null here and the page renders "not
+    // scored" -- which is the honest state, and better than a second derivation
+    // that can disagree with the CLI.
+    moves = moveSubset(backtest);
   }
 
   return {
@@ -244,7 +330,15 @@ async function loadFed(): Promise<FedBundle> {
       ? null
       : "No trained model. Run `python cli.py all` in engine/.",
     asOf: new Date().toISOString(),
+    source: engineUnreachable ? "snapshot" : "live",
+    generatedAt: engineUnreachable ? snapshotGeneratedAt() : null,
   };
+}
+
+/** When `data/snapshot.json` was frozen, or null if the file carries no stamp. */
+function snapshotGeneratedAt(): string | null {
+  const at = (snapshot as { generated_at?: unknown }).generated_at;
+  return typeof at === "string" ? at : null;
 }
 
 export const getFed: () => Promise<FedBundle> = memo(

@@ -24,31 +24,66 @@ Walk-forward, 233 scheduled meetings, 1997-08-19 → 2026-09-16. Every number be
 out-of-sample: to predict meeting *i* the model sees meetings `0..i-1` and nothing else —
 scaler, imputation medians, cutpoints and coefficients all refit at each step.
 
-| | model | always-hold | repeat-last | market-implied |
-|---|---|---|---|---|
-| direction, all meetings | **84.6%** | 68.7% | 79.0% | 66.1% |
-| 5-class, all meetings | **82.4%** | — | — | — |
-| log loss | **0.494** | — | — | — |
-| mean abs. error | **6.76 bp** | — | — | — |
+| | model | always-hold | repeat-last | curve proxy | fed funds futures |
+|---|---|---|---|---|---|
+| direction, all meetings | 84.6% | 68.7% | 79.0% | 66.1% | **90.8%** |
+| meetings it can score | 233 | 233 | 233 | 233 | **196** |
+| 5-class, all meetings | **82.4%** | — | — | — | — |
+| log loss | **0.494** | — | — | — | — |
+| mean abs. error | **6.76 bp** | — | — | — | — |
 
 **Read the baselines first.** The Fed holds ~71% of scheduled meetings, so an accuracy
 number without them means nothing at all. That is why they sit in the same table.
+
+**Two of those columns are both called "the market" and they are not the same thing.**
+The *curve proxy* is the sign of `DGS1 − EFFR`, a yield spread standing in for market
+expectations; it covers every meeting. *Fed funds futures* is the CME ZQ strip run
+through the FedWatch arithmetic — what the market had genuinely priced — and it is
+**null on the 37 meetings the strip cannot reach**, rather than quietly falling back to
+the spread. That is why its column says 196 and the others say 233.
 
 ### The number that actually matters
 
 All-meeting accuracy is dominated by holds. On the 73 meetings where the Committee
 *moved*, the picture inverts — and it is the honest way to read this model:
 
-| on the 73 moves / 160 holds | model | market-implied curve |
-|---|---|---|
-| direction correct **on moves** | 65.8% | **91.8%** |
-| cries "move" **on holds** (false alarm) | **6.9%** | 45.6% |
+| | model | curve proxy | fed funds futures |
+|---|---|---|---|
+| direction correct **on moves** | 65.8% | **91.8%** | 83.1% |
+| cries "move" **on holds** (false alarm) | 6.9% | 45.6% | **5.3%** |
+| scored on | 233 (73 / 160) | 233 (73 / 160) | 196 (65 / 131) |
 
-The curve looks brilliant on moves because it is scored on a subset chosen by the
-outcome. It buys that 91.8% by signalling a move at **45.6% of all holds** — nearly one
-in two. The model trades recall for precision, deliberately and heavily. Neither column
-is the whole truth, which is exactly why `cli.py backtest` prints both and the dashboard
-cannot render one without the other.
+**Read the two rows together or not at all.** The curve's 91.8% is the number that looks
+like a verdict and is not one: it is bought by signalling a move at **45.6% of all
+holds**, nearly one in two. The model trades recall for precision, deliberately and
+heavily. The engine publishes recall and its false-alarm rate in the same record for
+exactly this reason, `cli.py backtest` prints them as one table, and the dashboard reads
+that table rather than deriving its own.
+
+**The real futures strip is not bought that way, and it beats the model on both axes at
+once.** On the 196 meetings it reaches, every caller rescored on those same rows:
+
+| on the 196 meetings the strip reaches | direction, all | on moves | false alarm on holds |
+|---|---|---|---|
+| model | 84.7% | 64.6% | 5.3% |
+| always say hold | 66.8% | 0.0% | 0.0% |
+| repeat the last action | 81.1% | 66.2% | 11.5% |
+| curve proxy | 66.3% | 90.8% | 45.8% |
+| **fed funds futures** | **90.8%** | **83.1%** | **5.3%** |
+
+That is the honest headline of this repo and it is not a flattering one: an ordered logit
+on 57 macro columns does not beat what the market had already priced, on the meetings
+that matter, at equal false-alarm cost. It is not close — 18.5 points of recall. Nothing
+was tuned to produce that number: a move counts as "priced" past **±12.5bp**, half of the
+smallest increment the Committee uses, chosen before the number was computed and not
+searched over. Tightening the band to ±10bp makes the futures column *better* (90.8% on
+moves at 6.9% false alarms), not worse, so the conclusion does not hang on where the band
+sits.
+
+What the model is still for: it is a *distribution* with an exact attribution behind it,
+fitted on the reaction function rather than on the price. The futures strip tells you
+what is priced and nothing about why. Read the model as a structured argument with the
+market, not as an edge over it.
 
 ---
 

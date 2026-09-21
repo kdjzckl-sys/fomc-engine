@@ -10,10 +10,141 @@
  "baseline_always_hold": 0.6866952789699571,
  "baseline_market_direction": 0.6609442060085837,
  "baseline_persistence": 0.7896995708154506,
+ "baseline_futures_direction": 0.9081632653061225,
+ "baseline_futures_n": 196,
+ "baseline_futures_band_bp": 12.5,
  "n_moves": 73,
  "move_accuracy_5class": 0.589041095890411,
  "move_accuracy_direction": 0.6575342465753424,
  "false_alarm_rate": 0.06875,
+ "move_subset": {
+  "n": 233,
+  "n_moves": 73,
+  "n_holds": 160,
+  "futures_band_bp": 12.5,
+  "note": "Recall on moves and false alarms on holds are one record per caller because either alone misleads: the curve proxy calls 91.8% of moves and pays for it by crying 'move' at 45.6% of holds.",
+  "rows": [
+   {
+    "key": "model",
+    "label": "this model",
+    "n": 233,
+    "n_moves": 73,
+    "n_holds": 160,
+    "all_direction": 0.8454935622317596,
+    "move_direction": 0.6575342465753424,
+    "hold_false_alarm": 0.06875,
+    "move_5class": 0.589041095890411
+   },
+   {
+    "key": "always_hold",
+    "label": "always say hold",
+    "n": 233,
+    "n_moves": 73,
+    "n_holds": 160,
+    "all_direction": 0.6866952789699571,
+    "move_direction": 0.0,
+    "hold_false_alarm": 0.0,
+    "move_5class": null
+   },
+   {
+    "key": "repeat_last",
+    "label": "repeat the last action",
+    "n": 233,
+    "n_moves": 73,
+    "n_holds": 160,
+    "all_direction": 0.7896995708154506,
+    "move_direction": 0.6575342465753424,
+    "hold_false_alarm": 0.15,
+    "move_5class": null
+   },
+   {
+    "key": "market_proxy",
+    "label": "market-implied (1y - funds proxy)",
+    "n": 233,
+    "n_moves": 73,
+    "n_holds": 160,
+    "all_direction": 0.6609442060085837,
+    "move_direction": 0.9178082191780822,
+    "hold_false_alarm": 0.45625,
+    "move_5class": null
+   },
+   {
+    "key": "market_futures",
+    "label": "market-implied (fed funds futures)",
+    "n": 196,
+    "n_moves": 65,
+    "n_holds": 131,
+    "all_direction": 0.9081632653061225,
+    "move_direction": 0.8307692307692308,
+    "hold_false_alarm": 0.05343511450381679,
+    "move_5class": null
+   }
+  ],
+  "like_for_like": {
+   "basis": "market_futures",
+   "n": 196,
+   "n_moves": 65,
+   "n_holds": 131,
+   "note": "Every caller rescored on exactly the meetings the futures strip reaches, so the futures column is compared against the others on identical rows.",
+   "rows": [
+    {
+     "key": "model",
+     "label": "this model",
+     "n": 196,
+     "n_moves": 65,
+     "n_holds": 131,
+     "all_direction": 0.8469387755102041,
+     "move_direction": 0.6461538461538462,
+     "hold_false_alarm": 0.05343511450381679,
+     "move_5class": 0.5692307692307692
+    },
+    {
+     "key": "always_hold",
+     "label": "always say hold",
+     "n": 196,
+     "n_moves": 65,
+     "n_holds": 131,
+     "all_direction": 0.6683673469387755,
+     "move_direction": 0.0,
+     "hold_false_alarm": 0.0,
+     "move_5class": null
+    },
+    {
+     "key": "repeat_last",
+     "label": "repeat the last action",
+     "n": 196,
+     "n_moves": 65,
+     "n_holds": 131,
+     "all_direction": 0.8112244897959183,
+     "move_direction": 0.6615384615384615,
+     "hold_false_alarm": 0.11450381679389313,
+     "move_5class": null
+    },
+    {
+     "key": "market_proxy",
+     "label": "market-implied (1y - funds proxy)",
+     "n": 196,
+     "n_moves": 65,
+     "n_holds": 131,
+     "all_direction": 0.6632653061224489,
+     "move_direction": 0.9076923076923077,
+     "hold_false_alarm": 0.4580152671755725,
+     "move_5class": null
+    },
+    {
+     "key": "market_futures",
+     "label": "market-implied (fed funds futures)",
+     "n": 196,
+     "n_moves": 65,
+     "n_holds": 131,
+     "all_direction": 0.9081632653061225,
+     "move_direction": 0.8307692307692308,
+     "hold_false_alarm": 0.05343511450381679,
+     "move_5class": null
+    }
+   ]
+  }
+ },
  "calibration": [
   {
    "bin": "0-20%",
@@ -62,7 +193,9 @@
    "exp_bp": 4.002163594611026,
    "zlb": false,
    "mkt_1y": 0.07545454545454433,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -12.91666666666531,
+   "ff_source": "futures"
   },
   {
    "date": "1997-09-30",
@@ -79,7 +212,9 @@
    "exp_bp": 4.387591119673408,
    "zlb": false,
    "mkt_1y": 0.0015584415584406486,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 8.000000000000096,
+   "ff_source": "futures"
   },
   {
    "date": "1997-11-12",
@@ -96,7 +231,9 @@
    "exp_bp": 0.32446912783956666,
    "zlb": false,
    "mkt_1y": -0.12272727272727302,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 4.999999999998828,
+   "ff_source": "futures"
   },
   {
    "date": "1997-12-16",
@@ -113,7 +250,9 @@
    "exp_bp": 0.4280059404186116,
    "zlb": false,
    "mkt_1y": 0.028311688311688954,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 14.466666666667471,
+   "ff_source": "futures"
   },
   {
    "date": "1998-02-04",
@@ -130,7 +269,9 @@
    "exp_bp": 0.09594631432890305,
    "zlb": false,
    "mkt_1y": -0.27818181818181653,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -4.666666666666064,
+   "ff_source": "futures"
   },
   {
    "date": "1998-03-31",
@@ -147,7 +288,9 @@
    "exp_bp": -0.01862654902118205,
    "zlb": false,
    "mkt_1y": -0.07428571428571384,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 4.999999999999627,
+   "ff_source": "futures"
   },
   {
    "date": "1998-05-19",
@@ -164,7 +307,9 @@
    "exp_bp": -0.715584875218373,
    "zlb": false,
    "mkt_1y": -0.1261038961038956,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -20.66666666666661,
+   "ff_source": "futures"
   },
   {
    "date": "1998-06-30",
@@ -181,7 +326,9 @@
    "exp_bp": -1.1309450462238937,
    "zlb": false,
    "mkt_1y": -0.06155844155844292,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 4.999999999999716,
+   "ff_source": "futures"
   },
   {
    "date": "1998-08-18",
@@ -198,7 +345,9 @@
    "exp_bp": -0.7716674792324741,
    "zlb": false,
    "mkt_1y": -0.31350649350649284,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -7.153846153845844,
+   "ff_source": "futures"
   },
   {
    "date": "1998-09-29",
@@ -215,7 +364,9 @@
    "exp_bp": -18.652837266440443,
    "zlb": false,
    "mkt_1y": -0.8418181818181827,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -29.99999999999936,
+   "ff_source": "futures"
   },
   {
    "date": "1998-11-17",
@@ -232,7 +383,9 @@
    "exp_bp": -35.541234321493526,
    "zlb": false,
    "mkt_1y": -0.3687878787878791,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": -11.538461538460076,
+   "ff_source": "futures"
   },
   {
    "date": "1998-12-22",
@@ -249,7 +402,9 @@
    "exp_bp": -15.253161765079822,
    "zlb": false,
    "mkt_1y": -0.3723376623376611,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": -31.000000000002448,
+   "ff_source": "futures"
   },
   {
    "date": "1999-02-03",
@@ -266,7 +421,9 @@
    "exp_bp": -0.46540363504671234,
    "zlb": false,
    "mkt_1y": -0.24545454545454515,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -6.719999999999615,
+   "ff_source": "futures"
   },
   {
    "date": "1999-03-30",
@@ -283,7 +440,9 @@
    "exp_bp": 1.716164234407755,
    "zlb": false,
    "mkt_1y": -0.06467532467532511,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -2.0000000000004015,
+   "ff_source": "futures"
   },
   {
    "date": "1999-05-18",
@@ -300,7 +459,9 @@
    "exp_bp": 3.435139796844009,
    "zlb": false,
    "mkt_1y": 0.049870129870130064,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 2.3846153846167617,
+   "ff_source": "futures"
   },
   {
    "date": "1999-06-30",
@@ -317,7 +478,9 @@
    "exp_bp": 5.430254525952122,
    "zlb": false,
    "mkt_1y": 0.31402597402597454,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 19.000000000000217,
+   "ff_source": "futures"
   },
   {
    "date": "1999-08-24",
@@ -334,7 +497,9 @@
    "exp_bp": 4.444486322444272,
    "zlb": false,
    "mkt_1y": 0.20181818181818212,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 39.857142857143835,
+   "ff_source": "futures"
   },
   {
    "date": "1999-10-05",
@@ -351,7 +516,9 @@
    "exp_bp": 4.4366280332693915,
    "zlb": false,
    "mkt_1y": -0.056883116883116536,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 3.5769230769238547,
+   "ff_source": "futures"
   },
   {
    "date": "1999-11-16",
@@ -368,7 +535,9 @@
    "exp_bp": 5.973226943820563,
    "zlb": false,
    "mkt_1y": 0.17924242424242465,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 15.000000000000835,
+   "ff_source": "futures"
   },
   {
    "date": "1999-12-21",
@@ -385,7 +554,9 @@
    "exp_bp": 40.808856585488805,
    "zlb": false,
    "mkt_1y": 0.39870129870129745,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 3.10000000000219,
+   "ff_source": "futures"
   },
   {
    "date": "2000-02-02",
@@ -402,7 +573,9 @@
    "exp_bp": 56.56607451090238,
    "zlb": false,
    "mkt_1y": 0.6532467532467532,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 25.77777777777701,
+   "ff_source": "futures"
   },
   {
    "date": "2000-03-21",
@@ -419,7 +592,9 @@
    "exp_bp": 17.899062843553757,
    "zlb": false,
    "mkt_1y": 0.424025974025974,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 24.799999999998423,
+   "ff_source": "futures"
   },
   {
    "date": "2000-05-16",
@@ -436,7 +611,9 @@
    "exp_bp": 9.095900234006566,
    "zlb": false,
    "mkt_1y": 0.34038961038961,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 37.20000000000088,
+   "ff_source": "futures"
   },
   {
    "date": "2000-06-28",
@@ -453,7 +630,9 @@
    "exp_bp": 4.142336020952616,
    "zlb": false,
    "mkt_1y": -0.3612987012986988,
-   "prev_label": 2
+   "prev_label": 2,
+   "ff_priced_bp": 5.000000000000249,
+   "ff_source": "futures"
   },
   {
    "date": "2000-08-22",
@@ -470,7 +649,9 @@
    "exp_bp": 3.971610858321048,
    "zlb": false,
    "mkt_1y": -0.28493506493506526,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 3.444444444442407,
+   "ff_source": "futures"
   },
   {
    "date": "2000-10-03",
@@ -487,7 +668,9 @@
    "exp_bp": -0.8779263549975465,
    "zlb": false,
    "mkt_1y": -0.4728571428571442,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -11.07142857142911,
+   "ff_source": "futures"
   },
   {
    "date": "2000-11-15",
@@ -504,7 +687,9 @@
    "exp_bp": 2.3251054116097833,
    "zlb": false,
    "mkt_1y": -0.3644155844155854,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 4.0000000000009805,
+   "ff_source": "futures"
   },
   {
    "date": "2000-12-19",
@@ -521,7 +706,9 @@
    "exp_bp": -1.5398418340648665,
    "zlb": false,
    "mkt_1y": -0.7892207792207806,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -10.333333333334949,
+   "ff_source": "futures"
   },
   {
    "date": "2001-01-31",
@@ -538,7 +725,9 @@
    "exp_bp": -14.12627594310166,
    "zlb": false,
    "mkt_1y": -1.1620779220779216,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -45.99999999999946,
+   "ff_source": "futures"
   },
   {
    "date": "2001-03-20",
@@ -555,7 +744,9 @@
    "exp_bp": -52.21745334202069,
    "zlb": false,
    "mkt_1y": -1.12,
-   "prev_label": -2
+   "prev_label": -2,
+   "ff_priced_bp": -45.0909090909076,
+   "ff_source": "futures"
   },
   {
    "date": "2001-05-15",
@@ -572,7 +763,9 @@
    "exp_bp": -54.37017059882828,
    "zlb": false,
    "mkt_1y": -0.6774025974025966,
-   "prev_label": -2
+   "prev_label": -2,
+   "ff_priced_bp": -40.68749999999896,
+   "ff_source": "futures"
   },
   {
    "date": "2001-06-27",
@@ -589,7 +782,9 @@
    "exp_bp": -31.188740012243755,
    "zlb": false,
    "mkt_1y": -0.487662337662337,
-   "prev_label": -2
+   "prev_label": -2,
+   "ff_priced_bp": -37.00000000000006,
+   "ff_source": "futures"
   },
   {
    "date": "2001-08-21",
@@ -606,7 +801,9 @@
    "exp_bp": -0.867320185028527,
    "zlb": false,
    "mkt_1y": -0.2750649350649357,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": -21.700000000001385,
+   "ff_source": "futures"
   },
   {
    "date": "2001-10-02",
@@ -623,7 +820,9 @@
    "exp_bp": -34.90117423966856,
    "zlb": false,
    "mkt_1y": -0.5097402597402589,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": -55.586206896551495,
+   "ff_source": "futures"
   },
   {
    "date": "2001-11-06",
@@ -640,7 +839,9 @@
    "exp_bp": -50.07368471552998,
    "zlb": false,
    "mkt_1y": -0.3927272727272726,
-   "prev_label": -2
+   "prev_label": -2,
+   "ff_priced_bp": -43.7500000000004,
+   "ff_source": "futures"
   },
   {
    "date": "2001-12-11",
@@ -657,7 +858,9 @@
    "exp_bp": -13.233012660789718,
    "zlb": false,
    "mkt_1y": 0.21818181818181848,
-   "prev_label": -2
+   "prev_label": -2,
+   "ff_priced_bp": -18.600000000000417,
+   "ff_source": "futures"
   },
   {
    "date": "2002-01-30",
@@ -674,7 +877,9 @@
    "exp_bp": -10.164157695176907,
    "zlb": false,
    "mkt_1y": 0.4162121212121208,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": -4.999999999999605,
+   "ff_source": "futures"
   },
   {
    "date": "2002-03-19",
@@ -691,7 +896,9 @@
    "exp_bp": 0.06377619460095224,
    "zlb": false,
    "mkt_1y": 0.8466233766233764,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 5.166666666665676,
+   "ff_source": "futures"
   },
   {
    "date": "2002-05-07",
@@ -708,7 +915,9 @@
    "exp_bp": -0.21890858323344242,
    "zlb": false,
    "mkt_1y": 0.5429870129870125,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -5.166666666666675,
+   "ff_source": "futures"
   },
   {
    "date": "2002-06-26",
@@ -725,7 +934,9 @@
    "exp_bp": -0.545358191737501,
    "zlb": false,
    "mkt_1y": 0.38935064935064934,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 1.0000000000005116,
+   "ff_source": "futures"
   },
   {
    "date": "2002-08-13",
@@ -742,7 +953,9 @@
    "exp_bp": -17.21018609457484,
    "zlb": false,
    "mkt_1y": -0.03584415584415579,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -3.4444444444439393,
+   "ff_source": "futures"
   },
   {
    "date": "2002-09-24",
@@ -759,7 +972,9 @@
    "exp_bp": -1.9494904206649284,
    "zlb": false,
    "mkt_1y": 0.005714285714286005,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -3.0000000000002247,
+   "ff_source": "futures"
   },
   {
    "date": "2002-11-06",
@@ -776,7 +991,9 @@
    "exp_bp": -4.426097856933631,
    "zlb": false,
    "mkt_1y": -0.2536363636363639,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -28.74999999999939,
+   "ff_source": "futures"
   },
   {
    "date": "2002-12-10",
@@ -793,7 +1010,9 @@
    "exp_bp": -7.643563831799489,
    "zlb": false,
    "mkt_1y": 0.29519480519480523,
-   "prev_label": -2
+   "prev_label": -2,
+   "ff_priced_bp": 5.995204332975845e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2003-01-29",
@@ -810,7 +1029,9 @@
    "exp_bp": -1.944918004892605,
    "zlb": false,
    "mkt_1y": 0.08803030303030313,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.9999999999998899,
+   "ff_source": "futures"
   },
   {
    "date": "2003-03-18",
@@ -827,7 +1048,9 @@
    "exp_bp": -6.856859925834105,
    "zlb": false,
    "mkt_1y": -0.0822077922077924,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -19.076923076923368,
+   "ff_source": "futures"
   },
   {
    "date": "2003-05-06",
@@ -844,7 +1067,9 @@
    "exp_bp": -0.5141734818708796,
    "zlb": false,
    "mkt_1y": -0.017012987012986702,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -8.680000000000799,
+   "ff_source": "futures"
   },
   {
    "date": "2003-06-25",
@@ -861,7 +1086,9 @@
    "exp_bp": -1.7207473683772887,
    "zlb": false,
    "mkt_1y": -0.30051948051948063,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -35.999999999999545,
+   "ff_source": "futures"
   },
   {
    "date": "2003-08-12",
@@ -878,7 +1105,9 @@
    "exp_bp": 6.937517444757849,
    "zlb": false,
    "mkt_1y": 0.31298701298701326,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": 6.526315789473691,
+   "ff_source": "futures"
   },
   {
    "date": "2003-09-16",
@@ -895,7 +1124,9 @@
    "exp_bp": 4.3250089863615235,
    "zlb": false,
    "mkt_1y": 0.2883838383838382,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 2.1428571428571352,
+   "ff_source": "futures"
   },
   {
    "date": "2003-10-28",
@@ -912,7 +1143,9 @@
    "exp_bp": 1.773539046801069,
    "zlb": false,
    "mkt_1y": 0.29961038961038966,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 5.10702591327572e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2003-12-09",
@@ -929,7 +1162,9 @@
    "exp_bp": 2.5955569090714388,
    "zlb": false,
    "mkt_1y": 0.3749350649350649,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 1.4090909090909154,
+   "ff_source": "futures"
   },
   {
    "date": "2004-01-28",
@@ -946,7 +1181,9 @@
    "exp_bp": -0.3369905898866375,
    "zlb": false,
    "mkt_1y": 0.20303030303030312,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.0,
+   "ff_source": "futures"
   },
   {
    "date": "2004-03-16",
@@ -963,7 +1200,9 @@
    "exp_bp": -0.4282643809361028,
    "zlb": false,
    "mkt_1y": 0.16103896103896131,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.0,
+   "ff_source": "futures"
   },
   {
    "date": "2004-05-04",
@@ -980,7 +1219,9 @@
    "exp_bp": 5.002355407477686,
    "zlb": false,
    "mkt_1y": 0.5496103896103894,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -1.1481481481486089,
+   "ff_source": "futures"
   },
   {
    "date": "2004-06-30",
@@ -997,7 +1238,9 @@
    "exp_bp": 39.45825729287702,
    "zlb": false,
    "mkt_1y": 1.1622077922077922,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 23.9999999999996,
+   "ff_source": "futures"
   },
   {
    "date": "2004-08-10",
@@ -1014,7 +1257,9 @@
    "exp_bp": 5.3937083301804165,
    "zlb": false,
    "mkt_1y": 0.77012987012987,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 17.71428571428595,
+   "ff_source": "futures"
   },
   {
    "date": "2004-09-21",
@@ -1031,7 +1276,9 @@
    "exp_bp": 8.36820202603701,
    "zlb": false,
    "mkt_1y": 0.5512987012987012,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": -5.329070518200751e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2004-11-10",
@@ -1048,7 +1295,9 @@
    "exp_bp": 8.745267739619964,
    "zlb": false,
    "mkt_1y": 0.6111688311688313,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 22.500000000000277,
+   "ff_source": "futures"
   },
   {
    "date": "2004-12-14",
@@ -1065,7 +1314,9 @@
    "exp_bp": 15.274071380559056,
    "zlb": false,
    "mkt_1y": 0.5606493506493502,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 16.411764705882437,
+   "ff_source": "futures"
   },
   {
    "date": "2005-02-02",
@@ -1082,7 +1333,9 @@
    "exp_bp": 27.00457608351596,
    "zlb": false,
    "mkt_1y": 0.5272727272727273,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 11.84615384615384,
+   "ff_source": "futures"
   },
   {
    "date": "2005-03-22",
@@ -1099,7 +1352,9 @@
    "exp_bp": 31.659115585454867,
    "zlb": false,
    "mkt_1y": 0.6912987012987024,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": -24.11111111111137,
+   "ff_source": "futures"
   },
   {
    "date": "2005-05-03",
@@ -1116,7 +1371,9 @@
    "exp_bp": 24.752699336871718,
    "zlb": false,
    "mkt_1y": 0.4880519480519476,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 12.178571428571416,
+   "ff_source": "futures"
   },
   {
    "date": "2005-06-30",
@@ -1133,7 +1390,9 @@
    "exp_bp": 13.372052280767159,
    "zlb": false,
    "mkt_1y": 0.36493506493506445,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 19.000000000000526,
+   "ff_source": "futures"
   },
   {
    "date": "2005-08-09",
@@ -1150,7 +1409,9 @@
    "exp_bp": 18.74564386844348,
    "zlb": false,
    "mkt_1y": 0.46480519480519433,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 2.818181818180898,
+   "ff_source": "futures"
   },
   {
    "date": "2005-09-20",
@@ -1167,7 +1428,9 @@
    "exp_bp": 15.53147046839074,
    "zlb": false,
    "mkt_1y": 0.26883116883116953,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": -6.0000000000016485,
+   "ff_source": "futures"
   },
   {
    "date": "2005-11-01",
@@ -1184,7 +1447,9 @@
    "exp_bp": 23.6520340879268,
    "zlb": false,
    "mkt_1y": 0.42701298701298684,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 15.517241379310276,
+   "ff_source": "futures"
   },
   {
    "date": "2005-12-13",
@@ -1201,7 +1466,9 @@
    "exp_bp": 23.697817970222417,
    "zlb": false,
    "mkt_1y": 0.28051948051948017,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 12.055555555555042,
+   "ff_source": "futures"
   },
   {
    "date": "2006-01-31",
@@ -1218,7 +1485,9 @@
    "exp_bp": 28.814498448332742,
    "zlb": false,
    "mkt_1y": 0.16233766233766111,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 11.999999999999478,
+   "ff_source": "futures"
   },
   {
    "date": "2006-03-28",
@@ -1235,7 +1504,9 @@
    "exp_bp": 33.395739679984246,
    "zlb": false,
    "mkt_1y": 0.1492929292929288,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 16.000000000000547,
+   "ff_source": "futures"
   },
   {
    "date": "2006-05-10",
@@ -1252,7 +1523,9 @@
    "exp_bp": 24.05422108752791,
    "zlb": false,
    "mkt_1y": 0.1562337662337665,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 19.19047619047527,
+   "ff_source": "futures"
   },
   {
    "date": "2006-06-29",
@@ -1269,7 +1542,9 @@
    "exp_bp": 21.331471859845667,
    "zlb": false,
    "mkt_1y": 0.2864935064935059,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 30.00000000000007,
+   "ff_source": "futures"
   },
   {
    "date": "2006-08-08",
@@ -1286,7 +1561,9 @@
    "exp_bp": 11.171271882555187,
    "zlb": false,
    "mkt_1y": -0.15519480519480489,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 4.043478260870437,
+   "ff_source": "futures"
   },
   {
    "date": "2006-09-20",
@@ -1303,7 +1580,9 @@
    "exp_bp": 1.4144591680823955,
    "zlb": false,
    "mkt_1y": -0.22103896103896137,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.0,
+   "ff_source": "futures"
   },
   {
    "date": "2006-10-25",
@@ -1320,7 +1599,9 @@
    "exp_bp": -0.35410224461734313,
    "zlb": false,
    "mkt_1y": -0.17987012987013085,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -5.329070518200751e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2006-12-12",
@@ -1337,7 +1618,9 @@
    "exp_bp": -0.7074351963323322,
    "zlb": false,
    "mkt_1y": -0.34779220779220754,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -3.263157894736235,
+   "ff_source": "futures"
   },
   {
    "date": "2007-01-31",
@@ -1354,7 +1637,9 @@
    "exp_bp": 0.48016152465568707,
    "zlb": false,
    "mkt_1y": -0.15805194805194844,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -2.0000000000004903,
+   "ff_source": "futures"
   },
   {
    "date": "2007-03-21",
@@ -1371,7 +1656,9 @@
    "exp_bp": -0.00877652402170448,
    "zlb": false,
    "mkt_1y": -0.3122077922077917,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 8.881784197001252e-14,
+   "ff_source": "futures"
   },
   {
    "date": "2007-05-09",
@@ -1388,7 +1675,9 @@
    "exp_bp": -1.746589461564485,
    "zlb": false,
    "mkt_1y": -0.3337662337662337,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -7.993605777301127e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2007-06-28",
@@ -1405,7 +1694,9 @@
    "exp_bp": -1.4851423156651196,
    "zlb": false,
    "mkt_1y": -0.29714285714285626,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.0,
+   "ff_source": "futures"
   },
   {
    "date": "2007-08-07",
@@ -1422,7 +1713,9 @@
    "exp_bp": -2.7208767615280585,
    "zlb": false,
    "mkt_1y": -0.4424675324675311,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -3.8750000000001172,
+   "ff_source": "futures"
   },
   {
    "date": "2007-09-18",
@@ -1439,7 +1732,9 @@
    "exp_bp": -40.003769807462255,
    "zlb": false,
    "mkt_1y": -0.9449350649350636,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -47.50000000000112,
+   "ff_source": "futures"
   },
   {
    "date": "2007-10-31",
@@ -1456,7 +1751,9 @@
    "exp_bp": -49.516847549239614,
    "zlb": false,
    "mkt_1y": -0.7983116883116876,
-   "prev_label": -2
+   "prev_label": -2,
+   "ff_priced_bp": -29.999999999999982,
+   "ff_source": "futures"
   },
   {
    "date": "2007-12-11",
@@ -1473,7 +1770,9 @@
    "exp_bp": -61.40329309022597,
    "zlb": false,
    "mkt_1y": -1.3062337662337669,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": -37.200000000000074,
+   "ff_source": "futures"
   },
   {
    "date": "2008-01-30",
@@ -1490,7 +1789,9 @@
    "exp_bp": -57.07055941921638,
    "zlb": false,
    "mkt_1y": -1.4098484848484851,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": -56.99999999999989,
+   "ff_source": "futures"
   },
   {
    "date": "2008-03-18",
@@ -1507,7 +1808,9 @@
    "exp_bp": -57.855677466289734,
    "zlb": false,
    "mkt_1y": -1.4496103896103893,
-   "prev_label": -2
+   "prev_label": -2,
+   "ff_priced_bp": -107.30769230769207,
+   "ff_source": "futures"
   },
   {
    "date": "2008-04-30",
@@ -1524,7 +1827,9 @@
    "exp_bp": -18.589866122585438,
    "zlb": false,
    "mkt_1y": -0.3674025974025974,
-   "prev_label": -2
+   "prev_label": -2,
+   "ff_priced_bp": -23.000000000000263,
+   "ff_source": "futures"
   },
   {
    "date": "2008-06-25",
@@ -1541,7 +1846,9 @@
    "exp_bp": 0.9026903040262935,
    "zlb": false,
    "mkt_1y": 0.6068831168831166,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": 2.999999999999603,
+   "ff_source": "futures"
   },
   {
    "date": "2008-08-05",
@@ -1558,7 +1865,9 @@
    "exp_bp": -4.507770798631002,
    "zlb": false,
    "mkt_1y": 0.24233766233766252,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -3.576923076922478,
+   "ff_source": "futures"
   },
   {
    "date": "2008-09-16",
@@ -1575,7 +1884,9 @@
    "exp_bp": -14.59830844230059,
    "zlb": false,
    "mkt_1y": -0.07727272727272672,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -38.571428571428235,
+   "ff_source": "futures"
   },
   {
    "date": "2008-10-29",
@@ -1592,7 +1903,9 @@
    "exp_bp": -9.958038539741867,
    "zlb": false,
    "mkt_1y": 0.8094805194805195,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -1.000000000000345,
+   "ff_source": "futures"
   },
   {
    "date": "2008-12-16",
@@ -1609,7 +1922,9 @@
    "exp_bp": -62.307225436531546,
    "zlb": false,
    "mkt_1y": 0.43383838383838386,
-   "prev_label": -2
+   "prev_label": -2,
+   "ff_priced_bp": 14.46666666666726,
+   "ff_source": "futures"
   },
   {
    "date": "2009-01-28",
@@ -1626,7 +1941,9 @@
    "exp_bp": -62.429858229985825,
    "zlb": true,
    "mkt_1y": 0.24469696969696966,
-   "prev_label": -2
+   "prev_label": -2,
+   "ff_priced_bp": 1.9999999999993745,
+   "ff_source": "futures"
   },
   {
    "date": "2009-03-18",
@@ -1643,7 +1960,9 @@
    "exp_bp": -5.92673189804061,
    "zlb": true,
    "mkt_1y": 0.5077922077922078,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 6.716849298982197e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2009-04-29",
@@ -1660,7 +1979,9 @@
    "exp_bp": -5.939037378959608,
    "zlb": true,
    "mkt_1y": 0.37,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 2.0000000000006817,
+   "ff_source": "futures"
   },
   {
    "date": "2009-06-24",
@@ -1677,7 +1998,9 @@
    "exp_bp": 12.61255175903432,
    "zlb": true,
    "mkt_1y": 0.2890909090909091,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -2.000000000000113,
+   "ff_source": "futures"
   },
   {
    "date": "2009-08-12",
@@ -1694,7 +2017,9 @@
    "exp_bp": 6.315631107589611,
    "zlb": true,
    "mkt_1y": 0.3135064935064935,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 2.7755575615628914e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2009-09-23",
@@ -1711,7 +2036,9 @@
    "exp_bp": 0.40497375148169973,
    "zlb": true,
    "mkt_1y": 0.23753246753246757,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -1.4654943925052066e-12,
+   "ff_source": "futures"
   },
   {
    "date": "2009-11-04",
@@ -1728,7 +2055,9 @@
    "exp_bp": 2.7415768918260746,
    "zlb": true,
    "mkt_1y": 0.28051948051948056,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 2.3076923076917817,
+   "ff_source": "futures"
   },
   {
    "date": "2009-12-16",
@@ -1745,7 +2074,9 @@
    "exp_bp": 2.39585751596013,
    "zlb": true,
    "mkt_1y": 0.21142857142857144,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 2.066666666665731,
+   "ff_source": "futures"
   },
   {
    "date": "2010-01-27",
@@ -1762,7 +2093,9 @@
    "exp_bp": 10.608326969441826,
    "zlb": true,
    "mkt_1y": 0.19424242424242427,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.9999999999995457,
+   "ff_source": "futures"
   },
   {
    "date": "2010-03-16",
@@ -1779,7 +2112,9 @@
    "exp_bp": 6.996501415002947,
    "zlb": true,
    "mkt_1y": 0.22779220779220785,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 3.497202527569243e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2010-04-28",
@@ -1796,7 +2131,9 @@
    "exp_bp": 1.6118366201174952,
    "zlb": true,
    "mkt_1y": 0.23727272727272727,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.9999999999993736,
+   "ff_source": "futures"
   },
   {
    "date": "2010-06-23",
@@ -1813,7 +2150,9 @@
    "exp_bp": -0.4075961220434565,
    "zlb": true,
    "mkt_1y": 0.11675324675324678,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 4.285714285713308,
+   "ff_source": "futures"
   },
   {
    "date": "2010-08-10",
@@ -1830,7 +2169,9 @@
    "exp_bp": -3.3006248295743785,
    "zlb": true,
    "mkt_1y": 0.08779220779220787,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 1.0075273948473296e-12,
+   "ff_source": "futures"
   },
   {
    "date": "2010-09-21",
@@ -1847,7 +2188,9 @@
    "exp_bp": -0.19519256604112267,
    "zlb": true,
    "mkt_1y": 0.06272727272727274,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -6.66666666666742,
+   "ff_source": "futures"
   },
   {
    "date": "2010-11-03",
@@ -1864,7 +2207,9 @@
    "exp_bp": -0.6226667266766717,
    "zlb": true,
    "mkt_1y": 0.03064935064935065,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -1.1111111111103549,
+   "ff_source": "futures"
   },
   {
    "date": "2010-12-14",
@@ -1881,7 +2226,9 @@
    "exp_bp": 0.5259639538216697,
    "zlb": true,
    "mkt_1y": 0.11285714285714288,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 3.0808688933348094e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2011-01-26",
@@ -1898,7 +2245,9 @@
    "exp_bp": 2.602722689841813,
    "zlb": true,
    "mkt_1y": 0.09909090909090915,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 1.6930901125533637e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2011-03-15",
@@ -1915,7 +2264,9 @@
    "exp_bp": 2.137643763835422,
    "zlb": true,
    "mkt_1y": 0.1085714285714286,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 1.0824674490095276e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2011-04-27",
@@ -1932,7 +2283,9 @@
    "exp_bp": 2.022467080863962,
    "zlb": true,
    "mkt_1y": 0.1303030303030303,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.9999999999999426,
+   "ff_source": "futures"
   },
   {
    "date": "2011-06-22",
@@ -1949,7 +2302,9 @@
    "exp_bp": 0.5594773598770195,
    "zlb": true,
    "mkt_1y": 0.08649350649350648,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -2.1316282072803006e-12,
+   "ff_source": "futures"
   },
   {
    "date": "2011-08-09",
@@ -1966,7 +2321,9 @@
    "exp_bp": -0.5450759764652777,
    "zlb": true,
    "mkt_1y": 0.046233766233766224,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -2.8181818181813383,
+   "ff_source": "futures"
   },
   {
    "date": "2011-09-21",
@@ -1983,7 +2340,9 @@
    "exp_bp": -1.8545251900279442,
    "zlb": true,
    "mkt_1y": 0.00805194805194806,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -3.3333333333339015,
+   "ff_source": "futures"
   },
   {
    "date": "2011-11-02",
@@ -2000,7 +2359,9 @@
    "exp_bp": 0.7143627491906923,
    "zlb": true,
    "mkt_1y": 0.05012987012987011,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 1.0714285714283873,
+   "ff_source": "futures"
   },
   {
    "date": "2011-12-13",
@@ -2017,7 +2378,9 @@
    "exp_bp": 1.4473418508201796,
    "zlb": true,
    "mkt_1y": 0.03311688311688313,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -2.9559688030644793e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2012-01-25",
@@ -2034,7 +2397,9 @@
    "exp_bp": 2.9369637127604897,
    "zlb": true,
    "mkt_1y": 0.019090909090909103,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -1.00000000000017,
+   "ff_source": "futures"
   },
   {
    "date": "2012-03-13",
@@ -2051,7 +2416,9 @@
    "exp_bp": 6.654049831912066,
    "zlb": true,
    "mkt_1y": 0.06207792207792205,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -9.992007221626409e-14,
+   "ff_source": "futures"
   },
   {
    "date": "2012-04-25",
@@ -2068,7 +2435,9 @@
    "exp_bp": 1.712415081796671,
    "zlb": true,
    "mkt_1y": 0.03662337662337661,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -2.0000000000004543,
+   "ff_source": "futures"
   },
   {
    "date": "2012-06-20",
@@ -2085,7 +2454,9 @@
    "exp_bp": 1.4107127761704883,
    "zlb": true,
    "mkt_1y": 0.011038961038961043,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -3.0000000000010267,
+   "ff_source": "futures"
   },
   {
    "date": "2012-07-31",
@@ -2102,7 +2473,9 @@
    "exp_bp": 1.603933163968591,
    "zlb": true,
    "mkt_1y": 0.03519480519480522,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 5.551115123125783e-14,
+   "ff_source": "futures"
   },
   {
    "date": "2012-09-13",
@@ -2119,7 +2492,9 @@
    "exp_bp": 2.147596960827502,
    "zlb": true,
    "mkt_1y": 0.029545454545454597,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -1.7647058823528405,
+   "ff_source": "futures"
   },
   {
    "date": "2012-10-24",
@@ -2136,7 +2511,9 @@
    "exp_bp": 2.5216682026214197,
    "zlb": true,
    "mkt_1y": 0.02558441558441557,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -4.428571428568912,
+   "ff_source": "futures"
   },
   {
    "date": "2012-12-12",
@@ -2153,7 +2530,9 @@
    "exp_bp": 1.8451710858926336,
    "zlb": true,
    "mkt_1y": 0.019090909090909075,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -5.551115123125783e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2013-01-30",
@@ -2170,7 +2549,9 @@
    "exp_bp": 1.0309525668901693,
    "zlb": true,
    "mkt_1y": 0.008333333333333304,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -1.000000000000456,
+   "ff_source": "futures"
   },
   {
    "date": "2013-03-20",
@@ -2187,7 +2568,9 @@
    "exp_bp": 1.2998861131142263,
    "zlb": true,
    "mkt_1y": -0.005064935064935022,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -2.818181818180215,
+   "ff_source": "futures"
   },
   {
    "date": "2013-05-01",
@@ -2204,7 +2587,9 @@
    "exp_bp": 1.2389345848887936,
    "zlb": true,
    "mkt_1y": -0.01675324675324673,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -1.033333333332863,
+   "ff_source": "futures"
   },
   {
    "date": "2013-06-19",
@@ -2221,7 +2606,9 @@
    "exp_bp": 1.0793793346883875,
    "zlb": true,
    "mkt_1y": 0.043506493506493535,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 9.3119956190435e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2013-07-31",
@@ -2238,7 +2625,9 @@
    "exp_bp": 3.1049904524854863,
    "zlb": true,
    "mkt_1y": 0.023766233766233782,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.9999999999994319,
+   "ff_source": "futures"
   },
   {
    "date": "2013-09-18",
@@ -2255,7 +2644,9 @@
    "exp_bp": 2.421416122062073,
    "zlb": true,
    "mkt_1y": 0.0485714285714286,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -4.2743586448068527e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2013-10-30",
@@ -2272,7 +2663,9 @@
    "exp_bp": 0.10989532115695128,
    "zlb": true,
    "mkt_1y": 0.025064935064935054,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -1.7069679003611782e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2013-12-18",
@@ -2289,7 +2682,9 @@
    "exp_bp": -0.45023419246530594,
    "zlb": true,
    "mkt_1y": 0.047922077922077935,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -2.384615384615792,
+   "ff_source": "futures"
   },
   {
    "date": "2014-01-29",
@@ -2306,7 +2701,9 @@
    "exp_bp": -0.20372782549190843,
    "zlb": true,
    "mkt_1y": 0.04166666666666666,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.9999999999998288,
+   "ff_source": "futures"
   },
   {
    "date": "2014-03-19",
@@ -2323,7 +2720,9 @@
    "exp_bp": 0.08690264790059044,
    "zlb": true,
    "mkt_1y": 0.0442857142857143,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -4.413136522884997e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2014-04-30",
@@ -2340,7 +2739,9 @@
    "exp_bp": 1.2898028256945213,
    "zlb": true,
    "mkt_1y": 0.010303030303030328,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -0.9999999999996595,
+   "ff_source": "futures"
   },
   {
    "date": "2014-06-18",
@@ -2357,7 +2758,9 @@
    "exp_bp": 0.657902279188313,
    "zlb": true,
    "mkt_1y": 0.014935064935064954,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 8.534839501805891e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2014-07-30",
@@ -2374,7 +2777,9 @@
    "exp_bp": 0.010604598599306014,
    "zlb": true,
    "mkt_1y": 0.017662337662337685,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 3.4139358007223564e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2014-09-17",
@@ -2391,7 +2796,9 @@
    "exp_bp": -0.4911815043275956,
    "zlb": true,
    "mkt_1y": 0.017142857142857154,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 7.882583474838611e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2014-10-29",
@@ -2408,7 +2815,9 @@
    "exp_bp": -1.7499456223090504,
    "zlb": true,
    "mkt_1y": 0.017142857142857154,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -1.00000000000017,
+   "ff_source": "futures"
   },
   {
    "date": "2014-12-17",
@@ -2425,7 +2834,9 @@
    "exp_bp": -0.5620805260219921,
    "zlb": true,
    "mkt_1y": 0.08376623376623375,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -2.2142857142858365,
+   "ff_source": "futures"
   },
   {
    "date": "2015-01-28",
@@ -2442,7 +2853,9 @@
    "exp_bp": -0.6399098938969092,
    "zlb": true,
    "mkt_1y": 0.048030303030303034,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 4.551914400963142e-13,
+   "ff_source": "futures"
   },
   {
    "date": "2015-03-18",
@@ -2459,7 +2872,9 @@
    "exp_bp": -0.04086466603279687,
    "zlb": true,
    "mkt_1y": 0.1388311688311688,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.0006549541766806555,
+   "ff_source": "futures"
   },
   {
    "date": "2015-04-29",
@@ -2476,7 +2891,9 @@
    "exp_bp": -0.2834645756589376,
    "zlb": true,
    "mkt_1y": 0.10714285714285715,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 2.000000000000568,
+   "ff_source": "futures"
   },
   {
    "date": "2015-06-17",
@@ -2493,7 +2910,9 @@
    "exp_bp": -0.10402386858151946,
    "zlb": true,
    "mkt_1y": 0.1485714285714286,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -0.0006338266225980327,
+   "ff_source": "futures"
   },
   {
    "date": "2015-07-29",
@@ -2510,7 +2929,9 @@
    "exp_bp": -0.42209895157608834,
    "zlb": true,
    "mkt_1y": 0.18961038961038965,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 18.000000000000227,
+   "ff_source": "futures"
   },
   {
    "date": "2015-09-17",
@@ -2527,7 +2948,9 @@
    "exp_bp": -1.159960723469192,
    "zlb": true,
    "mkt_1y": 0.2666666666666667,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 6.346928523137016,
+   "ff_source": "futures"
   },
   {
    "date": "2015-10-28",
@@ -2544,7 +2967,9 @@
    "exp_bp": -2.2629849701574942,
    "zlb": true,
    "mkt_1y": 0.1088311688311688,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -11.285714285714286,
+   "ff_source": "proxy"
   },
   {
    "date": "2015-12-16",
@@ -2561,7 +2986,9 @@
    "exp_bp": 1.398797843175767,
    "zlb": true,
    "mkt_1y": 0.5522077922077921,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 17.0507568359375,
+   "ff_source": "futures"
   },
   {
    "date": "2016-01-27",
@@ -2578,7 +3005,9 @@
    "exp_bp": 0.6203654744027081,
    "zlb": false,
    "mkt_1y": 0.0942424242424243,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": -9.333333333333334,
+   "ff_source": "proxy"
   },
   {
    "date": "2016-03-16",
@@ -2595,7 +3024,9 @@
    "exp_bp": 3.7757657986698914,
    "zlb": false,
    "mkt_1y": 0.32428571428571434,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 2.067234293619796,
+   "ff_source": "futures"
   },
   {
    "date": "2016-04-27",
@@ -2612,7 +3043,9 @@
    "exp_bp": 5.43708728869686,
    "zlb": false,
    "mkt_1y": 0.1742857142857142,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -14.285714285714286,
+   "ff_source": "proxy"
   },
   {
    "date": "2016-06-15",
@@ -2629,7 +3062,9 @@
    "exp_bp": 2.5584672560647777,
    "zlb": false,
    "mkt_1y": 0.21571428571428558,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -0.4999389648437491,
+   "ff_source": "futures"
   },
   {
    "date": "2016-07-27",
@@ -2646,7 +3081,9 @@
    "exp_bp": 1.8149533591286666,
    "zlb": false,
    "mkt_1y": 0.14285714285714296,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -8.000000000000002,
+   "ff_source": "proxy"
   },
   {
    "date": "2016-09-21",
@@ -2663,7 +3100,9 @@
    "exp_bp": 2.2144161800406077,
    "zlb": false,
    "mkt_1y": 0.20142857142857146,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 2.500406901041674,
+   "ff_source": "futures"
   },
   {
    "date": "2016-11-02",
@@ -2680,7 +3119,9 @@
    "exp_bp": 3.0923272034197313,
    "zlb": false,
    "mkt_1y": 0.26337662337662343,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -6.999999999999997,
+   "ff_source": "proxy"
   },
   {
    "date": "2016-12-14",
@@ -2697,7 +3138,9 @@
    "exp_bp": 12.519026418330473,
    "zlb": false,
    "mkt_1y": 0.4242857142857142,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 22.338457892922797,
+   "ff_source": "futures"
   },
   {
    "date": "2017-02-01",
@@ -2714,7 +3157,9 @@
    "exp_bp": 8.710508492533226,
    "zlb": false,
    "mkt_1y": 0.1528571428571429,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": -15.142857142857144,
+   "ff_source": "proxy"
   },
   {
    "date": "2017-03-15",
@@ -2731,7 +3176,9 @@
    "exp_bp": 20.421239181195137,
    "zlb": false,
    "mkt_1y": 0.35857142857142843,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 23.249763488769524,
+   "ff_source": "futures"
   },
   {
    "date": "2017-05-03",
@@ -2748,7 +3195,9 @@
    "exp_bp": 3.7688890848207732,
    "zlb": false,
    "mkt_1y": 0.16896103896103898,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": -0.5537065778459693,
+   "ff_source": "futures"
   },
   {
    "date": "2017-06-14",
@@ -2765,7 +3214,9 @@
    "exp_bp": 9.016307223695962,
    "zlb": false,
    "mkt_1y": 0.2657142857142857,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 22.968978881835923,
+   "ff_source": "futures"
   },
   {
    "date": "2017-07-26",
@@ -2782,7 +3233,9 @@
    "exp_bp": 3.26200457183161,
    "zlb": false,
    "mkt_1y": 0.0585714285714285,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": -4.999999999999992,
+   "ff_source": "proxy"
   },
   {
    "date": "2017-09-20",
@@ -2799,7 +3252,9 @@
    "exp_bp": 3.0387915574586177,
    "zlb": false,
    "mkt_1y": 0.10857142857142876,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -1.5003662109374538,
+   "ff_source": "futures"
   },
   {
    "date": "2017-11-01",
@@ -2816,7 +3271,9 @@
    "exp_bp": 9.089901144649478,
    "zlb": false,
    "mkt_1y": 0.26571428571428557,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -4.999999999999981,
+   "ff_source": "proxy"
   },
   {
    "date": "2017-12-13",
@@ -2833,7 +3290,9 @@
    "exp_bp": 17.55093078340299,
    "zlb": false,
    "mkt_1y": 0.49857142857142867,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 22.820022583007837,
+   "ff_source": "futures"
   },
   {
    "date": "2018-01-31",
@@ -2850,7 +3309,9 @@
    "exp_bp": 11.607124083078178,
    "zlb": false,
    "mkt_1y": 0.372857142857143,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 1.142857142857144,
+   "ff_source": "proxy"
   },
   {
    "date": "2018-03-21",
@@ -2867,7 +3328,9 @@
    "exp_bp": 25.16100007466681,
    "zlb": false,
    "mkt_1y": 0.631168831168831,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 21.70000000000003,
+   "ff_source": "futures"
   },
   {
    "date": "2018-05-02",
@@ -2884,7 +3347,9 @@
    "exp_bp": 17.250940966430335,
    "zlb": false,
    "mkt_1y": 0.5451948051948052,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 14.571428571428584,
+   "ff_source": "proxy"
   },
   {
    "date": "2018-06-13",
@@ -2901,7 +3366,9 @@
    "exp_bp": 23.385502267359072,
    "zlb": false,
    "mkt_1y": 0.6071428571428579,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 21.618024040670946,
+   "ff_source": "futures"
   },
   {
    "date": "2018-08-01",
@@ -2918,7 +3385,9 @@
    "exp_bp": 19.479323270011236,
    "zlb": false,
    "mkt_1y": 0.5100000000000005,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 9.571428571428578,
+   "ff_source": "proxy"
   },
   {
    "date": "2018-09-26",
@@ -2935,7 +3404,9 @@
    "exp_bp": 23.498887065703304,
    "zlb": false,
    "mkt_1y": 0.6576623376623376,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 25.285714285714302,
+   "ff_source": "proxy"
   },
   {
    "date": "2018-11-08",
@@ -2952,7 +3423,9 @@
    "exp_bp": 9.279692348619706,
    "zlb": false,
    "mkt_1y": 0.48701298701298734,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 0.3408258611505399,
+   "ff_source": "futures"
   },
   {
    "date": "2018-12-19",
@@ -2969,7 +3442,9 @@
    "exp_bp": 5.0439214022998895,
    "zlb": false,
    "mkt_1y": 0.49389610389610406,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 19.374842325846366,
+   "ff_source": "futures"
   },
   {
    "date": "2019-01-30",
@@ -2986,7 +3461,9 @@
    "exp_bp": 2.2681586870752857,
    "zlb": false,
    "mkt_1y": 0.1933333333333338,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 0.500000000000019,
+   "ff_source": "proxy"
   },
   {
    "date": "2019-03-20",
@@ -3003,7 +3480,9 @@
    "exp_bp": 2.026967875894314,
    "zlb": false,
    "mkt_1y": 0.12428571428571455,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.7035134055398018,
+   "ff_source": "futures"
   },
   {
    "date": "2019-05-01",
@@ -3020,7 +3499,9 @@
    "exp_bp": 1.7006308931526373,
    "zlb": false,
    "mkt_1y": -0.014242424242425056,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -0.4999999999999967,
+   "ff_source": "proxy"
   },
   {
    "date": "2019-06-19",
@@ -3037,7 +3518,9 @@
    "exp_bp": -0.40554955125589254,
    "zlb": false,
    "mkt_1y": -0.3538961038961048,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -2.7271062677556746,
+   "ff_source": "futures"
   },
   {
    "date": "2019-07-31",
@@ -3054,7 +3537,9 @@
    "exp_bp": -2.729757928723219,
    "zlb": false,
    "mkt_1y": -0.4298701298701302,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -30.857142857142843,
+   "ff_source": "proxy"
   },
   {
    "date": "2019-09-18",
@@ -3071,7 +3556,9 @@
    "exp_bp": -2.7364053018291816,
    "zlb": false,
    "mkt_1y": -0.3366233766233766,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": -17.50061035156243,
+   "ff_source": "futures"
   },
   {
    "date": "2019-10-30",
@@ -3088,7 +3575,9 @@
    "exp_bp": -9.893736324703694,
    "zlb": false,
    "mkt_1y": -0.2527272727272729,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": -18.571428571428587,
+   "ff_source": "proxy"
   },
   {
    "date": "2019-12-11",
@@ -3105,7 +3594,9 @@
    "exp_bp": -2.125069374180621,
    "zlb": false,
    "mkt_1y": 0.020649350649350362,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": 1.1629257202148358,
+   "ff_source": "futures"
   },
   {
    "date": "2020-01-29",
@@ -3122,7 +3613,9 @@
    "exp_bp": -1.9228758894325475,
    "zlb": false,
    "mkt_1y": -0.0033333333333338544,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.16666666666666682,
+   "ff_source": "proxy"
   },
   {
    "date": "2020-04-29",
@@ -3139,7 +3632,9 @@
    "exp_bp": -27.090645100507853,
    "zlb": true,
    "mkt_1y": 0.11753246753246752,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 7.0,
+   "ff_source": "proxy"
   },
   {
    "date": "2020-06-10",
@@ -3156,7 +3651,9 @@
    "exp_bp": -0.6949579760242008,
    "zlb": true,
    "mkt_1y": 0.11428571428571428,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 1.875320434570313,
+   "ff_source": "futures"
   },
   {
    "date": "2020-07-29",
@@ -3173,7 +3670,9 @@
    "exp_bp": 0.7314714803810776,
    "zlb": true,
    "mkt_1y": 0.05155844155844161,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 2.5714285714285716,
+   "ff_source": "proxy"
   },
   {
    "date": "2020-09-16",
@@ -3190,7 +3689,9 @@
    "exp_bp": -5.800348048679897,
    "zlb": true,
    "mkt_1y": 0.05000000000000003,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -0.0007847377232139685,
+   "ff_source": "futures"
   },
   {
    "date": "2020-11-05",
@@ -3207,7 +3708,9 @@
    "exp_bp": -0.9194394882607477,
    "zlb": true,
    "mkt_1y": 0.03571428571428574,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -0.6001098632812507,
+   "ff_source": "futures"
   },
   {
    "date": "2020-12-16",
@@ -3224,7 +3727,9 @@
    "exp_bp": -0.6287018850570241,
    "zlb": true,
    "mkt_1y": 0.01142857142857144,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -0.0007568359374987566,
+   "ff_source": "futures"
   },
   {
    "date": "2021-01-27",
@@ -3241,7 +3746,9 @@
    "exp_bp": 0.5256357279446913,
    "zlb": true,
    "mkt_1y": 0.014545454545454556,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.1666666666666666,
+   "ff_source": "proxy"
   },
   {
    "date": "2021-03-17",
@@ -3258,7 +3765,9 @@
    "exp_bp": 0.41464644653952887,
    "zlb": true,
    "mkt_1y": 0.015714285714285695,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -6.757463727885549e-05,
+   "ff_source": "futures"
   },
   {
    "date": "2021-04-28",
@@ -3275,7 +3784,9 @@
    "exp_bp": 0.9900941886943435,
    "zlb": true,
    "mkt_1y": -0.0028571428571428775,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -4.2857142857142865,
+   "ff_source": "proxy"
   },
   {
    "date": "2021-06-16",
@@ -3292,7 +3803,9 @@
    "exp_bp": 1.2204533992170346,
    "zlb": true,
    "mkt_1y": -0.010000000000000016,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 2.1427917480468754,
+   "ff_source": "futures"
   },
   {
    "date": "2021-07-28",
@@ -3309,7 +3822,9 @@
    "exp_bp": 1.8484516128831943,
    "zlb": true,
    "mkt_1y": -0.025714285714285703,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -5.0,
+   "ff_source": "proxy"
   },
   {
    "date": "2021-09-22",
@@ -3326,7 +3841,9 @@
    "exp_bp": 0.6486154976960097,
    "zlb": true,
    "mkt_1y": -0.008571428571428563,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.0006866455078122224,
+   "ff_source": "futures"
   },
   {
    "date": "2021-11-03",
@@ -3343,7 +3860,9 @@
    "exp_bp": 4.460812244256382,
    "zlb": true,
    "mkt_1y": 0.06272727272727273,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -0.5558946397569459,
+   "ff_source": "futures"
   },
   {
    "date": "2021-12-15",
@@ -3360,7 +3879,9 @@
    "exp_bp": 1.337277670411042,
    "zlb": true,
    "mkt_1y": 0.20000000000000004,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.000354766845703236,
+   "ff_source": "futures"
   },
   {
    "date": "2022-01-26",
@@ -3377,7 +3898,9 @@
    "exp_bp": 3.245102582014155,
    "zlb": true,
    "mkt_1y": 0.49,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 8.5,
+   "ff_source": "proxy"
   },
   {
    "date": "2022-03-16",
@@ -3394,7 +3917,9 @@
    "exp_bp": 18.057031850617506,
    "zlb": true,
    "mkt_1y": 1.0742857142857143,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 27.899243164062497,
+   "ff_source": "futures"
   },
   {
    "date": "2022-05-04",
@@ -3411,7 +3936,9 @@
    "exp_bp": 60.201922249441985,
    "zlb": false,
    "mkt_1y": 1.7114285714285713,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 51.66652651186343,
+   "ff_source": "futures"
   },
   {
    "date": "2022-06-15",
@@ -3428,7 +3955,9 @@
    "exp_bp": 61.0806239014194,
    "zlb": false,
    "mkt_1y": 1.5671428571428572,
-   "prev_label": 2
+   "prev_label": 2,
+   "ff_priced_bp": 55.49963378906247,
+   "ff_source": "futures"
   },
   {
    "date": "2022-07-27",
@@ -3445,7 +3974,9 @@
    "exp_bp": 62.09612931032035,
    "zlb": false,
    "mkt_1y": 1.534285714285714,
-   "prev_label": 2
+   "prev_label": 2,
+   "ff_priced_bp": 91.85714285714286,
+   "ff_source": "proxy"
   },
   {
    "date": "2022-09-21",
@@ -3462,7 +3993,9 @@
    "exp_bp": 61.764040613027284,
    "zlb": false,
    "mkt_1y": 1.5628571428571432,
-   "prev_label": 2
+   "prev_label": 2,
+   "ff_priced_bp": 79.1657511393229,
+   "ff_source": "futures"
   },
   {
    "date": "2022-11-02",
@@ -3479,7 +4012,9 @@
    "exp_bp": 62.432841509802465,
    "zlb": false,
    "mkt_1y": 1.4971428571428578,
-   "prev_label": 2
+   "prev_label": 2,
+   "ff_priced_bp": 106.71428571428571,
+   "ff_source": "proxy"
   },
   {
    "date": "2022-12-14",
@@ -3496,7 +4031,9 @@
    "exp_bp": 50.528764170613556,
    "zlb": false,
    "mkt_1y": 0.890000000000001,
-   "prev_label": 2
+   "prev_label": 2,
+   "ff_priced_bp": 52.4265262379366,
+   "ff_source": "futures"
   },
   {
    "date": "2023-02-01",
@@ -3513,7 +4050,9 @@
    "exp_bp": 32.06139837019698,
    "zlb": false,
    "mkt_1y": 0.35857142857142943,
-   "prev_label": 2
+   "prev_label": 2,
+   "ff_priced_bp": 39.142857142857125,
+   "ff_source": "proxy"
   },
   {
    "date": "2023-03-22",
@@ -3530,7 +4069,9 @@
    "exp_bp": 13.132884575494316,
    "zlb": false,
    "mkt_1y": -0.158701298701299,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 17.221276177300293,
+   "ff_source": "futures"
   },
   {
    "date": "2023-05-03",
@@ -3547,7 +4088,9 @@
    "exp_bp": 12.518262091285314,
    "zlb": false,
    "mkt_1y": -0.08428571428571363,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 23.527157374790697,
+   "ff_source": "futures"
   },
   {
    "date": "2023-06-14",
@@ -3564,7 +4107,9 @@
    "exp_bp": 20.999412300048128,
    "zlb": false,
    "mkt_1y": 0.0942857142857152,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 6.562099456787074,
+   "ff_source": "futures"
   },
   {
    "date": "2023-07-26",
@@ -3581,7 +4126,9 @@
    "exp_bp": 31.892269036107685,
    "zlb": false,
    "mkt_1y": 0.26142857142857245,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 41.42857142857143,
+   "ff_source": "proxy"
   },
   {
    "date": "2023-09-20",
@@ -3598,7 +4145,9 @@
    "exp_bp": 27.86018734860326,
    "zlb": false,
    "mkt_1y": 0.09142857142857252,
-   "prev_label": 1
+   "prev_label": 1,
+   "ff_priced_bp": 0.7489929199219425,
+   "ff_source": "futures"
   },
   {
    "date": "2023-11-01",
@@ -3615,7 +4164,9 @@
    "exp_bp": 14.936053735973154,
    "zlb": false,
    "mkt_1y": 0.07857142857142918,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 25.714285714285698,
+   "ff_source": "proxy"
   },
   {
    "date": "2023-12-13",
@@ -3632,7 +4183,9 @@
    "exp_bp": 1.2641664701375173,
    "zlb": false,
    "mkt_1y": -0.24428571428571466,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.0003153483072892982,
+   "ff_source": "futures"
   },
   {
    "date": "2024-01-31",
@@ -3649,7 +4202,9 @@
    "exp_bp": -0.1663915423260196,
    "zlb": false,
    "mkt_1y": -0.5285714285714276,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 11.2857142857143,
+   "ff_source": "proxy"
   },
   {
    "date": "2024-03-20",
@@ -3666,7 +4221,9 @@
    "exp_bp": 0.4364796305316713,
    "zlb": false,
    "mkt_1y": -0.3257142857142856,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.0005160245028612565,
+   "ff_source": "futures"
   },
   {
    "date": "2024-05-01",
@@ -3683,7 +4240,9 @@
    "exp_bp": 0.8192696449462653,
    "zlb": false,
    "mkt_1y": -0.14999999999999947,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 12.142857142857139,
+   "ff_source": "proxy"
   },
   {
    "date": "2024-06-12",
@@ -3700,7 +4259,9 @@
    "exp_bp": 0.5415462954680706,
    "zlb": false,
    "mkt_1y": -0.1985714285714275,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.0003051757811789457,
+   "ff_source": "futures"
   },
   {
    "date": "2024-07-31",
@@ -3717,7 +4278,9 @@
    "exp_bp": -0.6541695615821373,
    "zlb": false,
    "mkt_1y": -0.49714285714285644,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 7.714285714285702,
+   "ff_source": "proxy"
   },
   {
    "date": "2024-09-18",
@@ -3734,7 +4297,9 @@
    "exp_bp": -43.23915078280715,
    "zlb": false,
    "mkt_1y": -1.2642857142857133,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -39.37484741210939,
+   "ff_source": "futures"
   },
   {
    "date": "2024-11-07",
@@ -3751,7 +4316,9 @@
    "exp_bp": -16.211202201406554,
    "zlb": false,
    "mkt_1y": -0.5557142857142843,
-   "prev_label": -2
+   "prev_label": -2,
+   "ff_priced_bp": -24.456282905910243,
+   "ff_source": "futures"
   },
   {
    "date": "2024-12-18",
@@ -3768,7 +4335,9 @@
    "exp_bp": -13.845518367623793,
    "zlb": false,
    "mkt_1y": -0.3628571428571421,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": -23.845353346604625,
+   "ff_source": "futures"
   },
   {
    "date": "2025-01-29",
@@ -3785,7 +4354,9 @@
    "exp_bp": -1.4538192662630114,
    "zlb": false,
    "mkt_1y": -0.1466666666666656,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": 1.8333333333333386,
+   "ff_source": "proxy"
   },
   {
    "date": "2025-03-19",
@@ -3802,7 +4373,9 @@
    "exp_bp": -4.027824647396237,
    "zlb": false,
    "mkt_1y": -0.2785714285714276,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -0.6459910074869235,
+   "ff_source": "futures"
   },
   {
    "date": "2025-05-07",
@@ -3819,7 +4392,9 @@
    "exp_bp": -18.371760200871346,
    "zlb": false,
    "mkt_1y": -0.39428571428571324,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -0.32299550374341734,
+   "ff_source": "futures"
   },
   {
    "date": "2025-06-18",
@@ -3836,7 +4411,9 @@
    "exp_bp": -1.8728448101428905,
    "zlb": false,
    "mkt_1y": -0.22714285714285687,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.00045776367185723643,
+   "ff_source": "futures"
   },
   {
    "date": "2025-07-30",
@@ -3853,7 +4430,9 @@
    "exp_bp": -1.4621412527421676,
    "zlb": false,
    "mkt_1y": -0.2514285714285709,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 8.000000000000007,
+   "ff_source": "proxy"
   },
   {
    "date": "2025-09-17",
@@ -3870,7 +4449,9 @@
    "exp_bp": -33.420873705955934,
    "zlb": false,
    "mkt_1y": -0.6785714285714279,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -25.961820162259563,
+   "ff_source": "futures"
   },
   {
    "date": "2025-10-29",
@@ -3887,7 +4468,9 @@
    "exp_bp": -21.616108824738873,
    "zlb": false,
    "mkt_1y": -0.5423376623376623,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": -16.000000000000018,
+   "ff_source": "proxy"
   },
   {
    "date": "2025-12-10",
@@ -3904,7 +4487,9 @@
    "exp_bp": -24.350418548764875,
    "zlb": false,
    "mkt_1y": -0.2885714285714287,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": -23.250270298549136,
+   "ff_source": "futures"
   },
   {
    "date": "2026-01-28",
@@ -3921,7 +4506,9 @@
    "exp_bp": -0.39681668558698374,
    "zlb": false,
    "mkt_1y": -0.10833333333333339,
-   "prev_label": -1
+   "prev_label": -1,
+   "ff_priced_bp": 5.16666666666666,
+   "ff_source": "proxy"
   },
   {
    "date": "2026-03-18",
@@ -3938,7 +4525,9 @@
    "exp_bp": -0.718862891114679,
    "zlb": false,
    "mkt_1y": -0.03571428571428559,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": -0.5968815730168497,
+   "ff_source": "futures"
   },
   {
    "date": "2026-04-29",
@@ -3955,7 +4544,9 @@
    "exp_bp": 1.0609870244197244,
    "zlb": false,
    "mkt_1y": 0.03571428571428514,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 5.285714285714275,
+   "ff_source": "proxy"
   },
   {
    "date": "2026-06-17",
@@ -3972,7 +4563,9 @@
    "exp_bp": 2.8422365331199724,
    "zlb": false,
    "mkt_1y": 0.2476623376623377,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 0.576359675480731,
+   "ff_source": "futures"
   },
   {
    "date": "2026-07-29",
@@ -3989,7 +4582,9 @@
    "exp_bp": 5.140529386420176,
    "zlb": false,
    "mkt_1y": 0.4642857142857135,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 27.571428571428587,
+   "ff_source": "proxy"
   },
   {
    "date": "2026-09-16",
@@ -4006,7 +4601,9 @@
    "exp_bp": 3.513396773393927,
    "zlb": false,
    "mkt_1y": 0.6116666666666664,
-   "prev_label": 0
+   "prev_label": 0,
+   "ff_priced_bp": 23.57097080775672,
+   "ff_source": "futures"
   }
  ]
 }

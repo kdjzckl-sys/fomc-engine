@@ -3,7 +3,9 @@
     python cli.py fetch          refresh the Fed calendar + every FRED series
     python cli.py build          rebuild the labelled history and design matrix
     python cli.py train          fit the production model on the full history
-    python cli.py backtest       walk-forward validation (the only honest score)
+    python cli.py backtest       walk-forward validation (the only honest score);
+                                 prints the move subset and the false-alarm rate
+                                 it cost, with every baseline beside them
     python cli.py tune           sweep L2 / half-life / feature blocks, walk-forward
     python cli.py predict        the next scheduled meeting
     python cli.py path [--n=4]   the next N meetings, conditional on today's data
@@ -99,6 +101,18 @@ def main() -> int:
             backtest.confusion(r["preds"])
             backtest.worst(r["preds"])
             print("\n  written: %s" % backtest.OUT)
+            # The artifact now carries the move subset itself -- every
+            # baseline recomputed on the meetings where the Fed moved, each
+            # one paired with the false-alarm rate on the holds that bought
+            # it. That number used to be rederived by the dashboard in
+            # JavaScript and again by a downstream consumer in Python, and
+            # three derivations of one figure drift -- they disagreed the
+            # first time this artifact was rebuilt mid-session. There is one
+            # derivation now and it is backtest.py.
+            ffn = r.get("baseline_futures_n")
+            if ffn is not None:
+                print("  futures baseline covers %d of %d meetings; the rest"
+                      " are null, not quietly proxied" % (ffn, r["n"]))
             if _flag("start", None):
                 # The artifact records its own from/to, but a narrowed run
                 # silently replacing the full-history scorecard is how a
