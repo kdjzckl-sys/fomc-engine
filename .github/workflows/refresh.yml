@@ -1,0 +1,83 @@
+# Keep the published forecast current.
+#
+# The deployed dashboard reads web/data/snapshot.json (a serverless host has no
+# Python and no FRED key). This job regenerates that snapshot from a full engine
+# run and commits it; Vercel's git integration redeploys on the push. The
+# snapshot's generated_at is rendered on the page, so a stalled job is visible,
+# never silently served as live.
+#
+# Needs one repo secret: FRED_API_KEY (free, fred.stlouisfed.org).
+
+name: refresh
+
+on:
+  schedule:
+    # 22:30 UTC weekdays: after the US close (futures settle, VIX, Treasuries)
+    # and after the 8:30/10:00 ET macro prints have reached FRED.
+    - cron: "30 22 * * 1-5"
+    # Sundays: pick up the SF Fed's weekly news-sentiment update.
+    - cron: "0 14 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.11"
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22"
+
+      # Upstream responses: FRED/ALFRED, the Board's documents (archived ones
+      # never change), the futures sources. A warm cache turns a cold ~10 min
+      # pull into a few requests. Keyed by week so it refreshes itself.
+      - name: Restore upstream cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: engine/data/cache
+          key: upstream-${{ github.run_id }}
+          restore-keys: upstream-
+
+      - name: Engine — fetch, build, train, backtest
+        working-directory: engine
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python cli.py all --refresh
+
+      - name: Engine tests
+        working-directory: engine
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python test_fomc.py
+
+      - name: Snapshot
+        working-directory: web
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: node scripts/snapshot.mjs
+
+      - name: Commit if anything moved
+        run: |
+          git config user.name "fomc-refresh[bot]"
+          git config user.email "fomc-refresh@users.noreply.github.com"
+          git add engine/data/decisions.json engine/data/fomc_meetings.json \
+                  engine/data/matrix.json engine/models/backtest.json \
+                  engine/models/current.json web/data/snapshot.json
+          if git diff --cached --quiet; then
+            echo "no change"; exit 0
+          fi
+          git commit -m "refresh: $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push

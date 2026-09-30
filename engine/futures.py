@@ -104,6 +104,7 @@ import calendar
 import datetime
 import io
 import json
+import sys
 import time
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -127,8 +128,17 @@ YAHOO = ("https://query1.finance.yahoo.com/v8/finance/chart/"
 YAHOO_FRONT = "ZQ%3DF"
 MONTH_CODE = "FGHJKMNQUVXZ"      # Jan..Dec, CME convention
 
-MPT_URL = ("https://www.atlantafed.org/-/media/Project/Atlanta/FRBA/Documents/"
-           "cenfis/market-probability-tracker/mpt_histdata.xlsx")
+# The Bank moved this file out of `cenfis/` in September 2026 and the old path
+# began serving a 200-status HTML 404 page. Current path first, old one kept as
+# a fallback in case the move is ever reverted; _cached_bytes rejects anything
+# that is not actually a zip, so a moved file can no longer poison the cache.
+MPT_URLS = (
+    "https://www.atlantafed.org/-/media/Project/Atlanta/FRBA/Documents/"
+    "research-and-data/data/market-probability-tracker/mpt_histdata.xlsx",
+    "https://www.atlantafed.org/-/media/Project/Atlanta/FRBA/Documents/"
+    "cenfis/market-probability-tracker/mpt_histdata.xlsx",
+)
+MPT_URL = MPT_URLS[0]
 MPT_PAGE = "https://www.atlantafed.org/research-and-data/data/market-probability-tracker"
 MPT_LICENCE = ("Federal Reserve Bank of Atlanta; CME Group market data used with "
                "permission. Personal and educational use only.")
@@ -163,18 +173,42 @@ def _fetch(url: str, timeout: int = 300, tries: int = 4) -> bytes:
     raise RuntimeError("fetch failed after %d tries: %s -- %s" % (tries, url, last))
 
 
-def _cached_bytes(name: str, url: str, refresh: bool, timeout: int = 300) -> bytes:
+def _cached_bytes(name: str, url, refresh: bool, timeout: int = 300,
+                  magic: bytes | None = None) -> bytes:
+    """Fetch-through cache. `url` may be one URL or a tuple tried in order.
+
+    `magic` is the leading bytes a real payload must start with (b"PK" for a
+    zip / xlsx). A publisher that moves a file often keeps answering 200 with an
+    HTML "not found" page; without this check that page was written over the
+    last good copy and every later read failed with "File is not a zip file".
+    """
     path = CACHE / name
+
+    def _ok(b: bytes) -> bool:
+        return magic is None or b[:len(magic)] == magic
+
     if not refresh and path.exists() and time.time() - path.stat().st_mtime < CACHE_TTL_S:
-        return path.read_bytes()
-    try:
-        blob = _fetch(url, timeout=timeout)
-    except RuntimeError:
-        if path.exists():
+        blob = path.read_bytes()
+        if _ok(blob):
+            return blob
+    urls = (url,) if isinstance(url, str) else tuple(url)
+    blob, err = None, None
+    for u in urls:
+        try:
+            got = _fetch(u, timeout=timeout)
+        except RuntimeError as e:
+            err = e
+            continue
+        if _ok(got):
+            blob = got
+            break
+        err = RuntimeError("%s did not return a %r payload" % (u, magic))
+    if blob is None:
+        if path.exists() and _ok(path.read_bytes()):
             # A stale copy beats silently degrading to the proxy without saying so.
-            print("  futures: fetch failed for %s; using cached copy" % name)
+            print("  futures: fetch failed for %s (%s); using cached copy" % (name, err), file=sys.stderr)
             return path.read_bytes()
-        raise
+        raise RuntimeError(str(err))
     CACHE.mkdir(parents=True, exist_ok=True)
     path.write_bytes(blob)
     return blob
@@ -201,7 +235,8 @@ def _ns_rows(refresh: bool = False) -> list[tuple[str, str, float]]:
     FFE(k+1), which is the contract k months ahead. The two families are the same
     strip under Datastream's two roll conventions.
     """
-    blob = _cached_bytes("ns_replication.zip", NS_URL, refresh, timeout=600)
+    blob = _cached_bytes("ns_replication.zip", NS_URL, refresh, timeout=600,
+                        magic=b"PK")
     text = zipfile.ZipFile(io.BytesIO(blob)).read(NS_MEMBER).decode("utf-8", "replace")
     lines = text.splitlines()
     head = lines[0].split(",")
@@ -289,7 +324,8 @@ def _mpt_rows(refresh: bool = False) -> list[dict]:
     if not refresh and path.exists() and time.time() - path.stat().st_mtime < CACHE_TTL_S:
         return json.loads(path.read_text(encoding="utf-8"))
 
-    blob = _cached_bytes("mpt_histdata.xlsx", MPT_URL, refresh, timeout=300)
+    blob = _cached_bytes("mpt_histdata.xlsx", MPT_URLS, refresh, timeout=300,
+                        magic=b"PK")
     z = zipfile.ZipFile(io.BytesIO(blob))
 
     strings: list[str] = []
@@ -385,14 +421,14 @@ def load(refresh: bool = False) -> dict:
         rows = _ns_rows(refresh=refresh)
     except Exception as e:  # noqa: BLE001
         print("  futures: Nakamura-Steinsson archive unavailable (%s);"
-              " pre-2000 falls back to the proxy" % e)
+              " pre-2000 falls back to the proxy" % e, file=sys.stderr)
         rows = []
     ns_last = max((d for d, _, _ in rows), default="0000-00-00")
     try:
         yahoo = _yahoo_rows(refresh=refresh)
     except Exception as e:  # noqa: BLE001
         print("  futures: Yahoo ZQ=F unavailable (%s); post-%s falls back to"
-              " the proxy" % (e, ns_last))
+              " the proxy" % (e, ns_last), file=sys.stderr)
         yahoo = []
     # NS is the authority where it reaches -- it is the full strip and it is
     # CC0. Yahoo fills everything after it, and the overlap is kept for the
@@ -414,7 +450,7 @@ def load(refresh: bool = False) -> dict:
         mpt = _mpt_rows(refresh=refresh)
     except Exception as e:  # noqa: BLE001
         print("  futures: Atlanta Fed tracker unavailable (%s);"
-              " ff_p_cut / ff_p_hike will be null throughout" % e)
+              " ff_p_cut / ff_p_hike will be null throughout" % e, file=sys.stderr)
         mpt = []
 
     def _prob(kind):

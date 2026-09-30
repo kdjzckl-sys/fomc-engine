@@ -19,6 +19,11 @@
                    DGS3MO-EFFR proxy. Writes *.noff artefacts and never
                    touches the published ones, so "do futures actually help"
                    is one command away instead of a claim in a README.
+    --no-news / --no-text / --no-shock   the same, for the news-sentiment,
+                   Fed-text and shock blocks. Each combination writes to its own
+                   tagged artefacts (e.g. backtest.notext.json).
+    --with-news / --with-text / --with-shock   turn a block ON when the
+                   published default has it off.
 
 Class C: deterministic, no model calls, no keys beyond FRED.
 """
@@ -53,6 +58,11 @@ def main() -> int:
     # overwrite the published ones.
     if _flag("no-futures", False):
         os.environ["FOMC_FUTURES"] = "0"
+    for block in ("news", "text", "shock"):
+        if _flag("no-" + block, False):
+            os.environ["FOMC_" + block.upper()] = "0"
+        if _flag("with-" + block, False):
+            os.environ["FOMC_" + block.upper()] = "1"
 
     if cmd in ("fetch", "all"):
         import calendar_fed
@@ -62,6 +72,9 @@ def main() -> int:
         print("  %d meetings, %s -> %s" % (len(cal), cal[0]["date"], cal[-1]["date"]))
         print("fetching FRED series...")
         features.load_series(refresh=True, verbose=True)
+        if features.TEXT:
+            print("fetching FOMC statements + SEPs...")
+            features.refresh_text(verbose=False)
 
     if cmd in ("build", "all"):
         import matrix

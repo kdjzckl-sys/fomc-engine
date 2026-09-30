@@ -162,6 +162,43 @@ def main():
               for c in features.FUTURES_COLUMNS),
           "FUTURES=%s" % features.FUTURES)
 
+    print("\nnews / text / shock blocks")
+    for flag, cols in ((features.NEWS, features.NEWS_COLUMNS),
+                       (features.TEXT, features.TEXT_COLUMNS),
+                       (features.SHOCK, features.SHOCK_COLUMNS)):
+        check("%s columns match the flag" % cols[0],
+              all((c in features.COLUMNS) == flag for c in cols))
+    check("published config writes untagged artefacts",
+          (features.artifact("matrix") == "matrix.json") == (features.ARTIFACT_TAG == ""))
+    if features.NEWS or features.SHOCK:
+        import news
+        ns = news.sentiment()
+        # The lag gate: no sentiment day may be public before PUB_LAG_DAYS after
+        # the day it describes, so a meeting can never read its own week's tone.
+        check("news sentiment carries its publication lag",
+              all(o.pub == fred.shift_days(o.date, news.PUB_LAG_DAYS) for o in ns[-500:]))
+        vis = fred.latest_as_of(ns, "2020-03-02")
+        check("news visible on 2020-03-02 stops >= %d days earlier" % news.PUB_LAG_DAYS,
+              vis is not None and vis.date <= fred.shift_days("2020-03-02", -news.PUB_LAG_DAYS),
+              vis.date if vis else "none")
+    if features.TEXT:
+        # The one leak that would be catastrophic: a meeting reading its own
+        # statement. derive is strict; this re-asserts it through the engine path.
+        ctx = features._text_ctx()
+        for d in ("2008-12-16", "2015-12-16", "2022-03-16", "2024-09-18"):
+            s = [x for x in ctx["corpus"] if x.published < d and x.kind == "meeting"]
+            own = [x for x in ctx["corpus"] if x.published == d]
+            row = ctx["derive"].row(d, corpus=ctx["corpus"], seps=ctx["seps"],
+                                    deltas=ctx["deltas"], path=ctx["path"])
+            check("text row for %s reads only the prior statement" % d,
+                  bool(own) and row.get("stmt_date") == s[-1].published < d,
+                  "%s" % row.get("stmt_date"))
+    if features.SHOCK:
+        f = {"vix_spike": 2.0, "equity_1m": -20.0, "credit_jump_1m": 0.1,
+             "nfci_chg_4w": None, "oil_1m": -30.0, "epu_spike": 0.1, "news_shock": -0.3}
+        check("shock_count counts tripped gauges and skips missing ones",
+              features._shock_count(f) == 4.0, str(features._shock_count(f)))
+
     print("\nmatrix")
     m = mx.load()
     check("one row per decision", len(m["rows"]) == len(dec))

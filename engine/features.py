@@ -53,10 +53,47 @@ import fred
 # leaves all three baselines untouched (they are properties of the same rows).
 # `FOMC_FUTURES=0`, or `cli.py <cmd> --no-futures`, turns it off and writes to
 # its own *.noff artefacts, so the claim stays falsifiable in one command.
-FUTURES = os.environ.get("FOMC_FUTURES", "1").strip().lower() not in ("0", "false", "no")
+def _on(var: str, default: str) -> bool:
+    return os.environ.get(var, default).strip().lower() not in ("0", "false", "no")
+
+
+FUTURES = _on("FOMC_FUTURES", "1")
+
+# Three more blocks, each switchable the same way and each measured against the
+# walk-forward record before its default was set (engine/README.md, "Beyond the
+# macro panel"):
+#   NEWS   news sentiment + news-based policy uncertainty      (news.py)
+#   TEXT   the Committee's own words: prior statement + dots   (text/derive.py)
+#   SHOCK  fast-moving stress: spikes, crashes, jumps          (this file)
+NEWS = _on("FOMC_NEWS", "0")
+TEXT = _on("FOMC_TEXT", "0")
+SHOCK = _on("FOMC_SHOCK", "0")
+
+# The published configuration. Any deviation from it writes to its own tagged
+# artefacts (matrix.<tag>.json, backtest.<tag>.json, ...) so a comparison run
+# can never overwrite the files the scorecard and the dashboard read.
+_PUBLISHED = {"ff": True, "news": False, "text": False, "shock": False}
+_STATE = {"ff": FUTURES, "news": NEWS, "text": TEXT, "shock": SHOCK}
+ARTIFACT_TAG = "-".join(("no" if not on else "with") + k
+                        for k, on in _STATE.items() if on != _PUBLISHED[k])
+
+
+def artifact(stem: str) -> str:
+    """'matrix' -> 'matrix.json' on the published config, else 'matrix.<tag>.json'."""
+    return stem + (".%s.json" % ARTIFACT_TAG if ARTIFACT_TAG else ".json")
+
 
 if FUTURES:
     import futures as ff_source
+if NEWS or SHOCK:
+    import news as news_source
+if TEXT:
+    import sys
+    from pathlib import Path
+    # Appended, not inserted: text/ has its own cli.py, and the engine's must win.
+    _TEXT_DIR = str(Path(__file__).resolve().parent / "text")
+    if _TEXT_DIR not in sys.path:
+        sys.path.append(_TEXT_DIR)
 
 # -- the series universe ----------------------------------------------------
 # vintage=True  -> revisable; use ALFRED initial releases + publication dates.
@@ -108,8 +145,30 @@ _CORE_COLUMNS = [
 # model saved against it -- is byte-identical to what it was before.
 FUTURES_COLUMNS = ["ff_exp_move_bp", "ff_p_cut", "ff_p_hike"]
 
+# News: the level and direction of economic news tone, and of news-measured
+# policy uncertainty. Both series count newspaper text; see news.py for what is
+# and is not point-in-time about them.
+NEWS_COLUMNS = ["news_sent", "news_sent_chg", "news_sent_intermeeting",
+                "epu", "epu_chg"]
+
+# The Committee's own words, strictly from documents published BEFORE the
+# meeting (text/README.md, "The leak this exists to avoid"). Exactly the six
+# columns text/README.md measured as surviving the persistence control; the
+# lexicon tone columns are deliberately absent -- they are mostly last_dir.
+TEXT_COLUMNS = ["sep_dot_y0_chg", "sep_dot_y1_chg", "sep_dot_minus_mid",
+                "stmt_risk_tilt_chg", "stmt_diff_changed_frac", "stmt_dissent_net"]
+
+# Shocks: the slow macro panel reads a crisis a month late. These are the
+# fast-moving versions -- short windows against long ones -- plus a count of
+# how many independent stress gauges are tripped at once.
+SHOCK_COLUMNS = ["vix_spike", "equity_1m", "credit_jump_1m", "nfci_chg_4w",
+                 "oil_1m", "epu_spike", "news_shock", "shock_count"]
+
 COLUMNS = (_CORE_COLUMNS
            + (FUTURES_COLUMNS if FUTURES else [])
+           + (NEWS_COLUMNS if NEWS else [])
+           + (TEXT_COLUMNS if TEXT else [])
+           + (SHOCK_COLUMNS if SHOCK else [])
            # meeting context stays last
            + ["is_sep", "days_since_prev"])
 
@@ -121,7 +180,55 @@ def load_series(refresh: bool = False, verbose: bool = False) -> dict:
         if verbose:
             print("  %-16s %5d obs  %s -> %s"
                   % (sid, len(out[sid]), out[sid][0].date, out[sid][-1].date))
+    if NEWS or SHOCK:
+        # Underscored keys: not FRED ids, and never confused with one.
+        out["_NEWS"] = news_source.sentiment(refresh=refresh)
+        out["_EPU"] = news_source.epu(refresh=refresh)
+        if verbose:
+            for k in ("_NEWS", "_EPU"):
+                print("  %-16s %5d obs  %s -> %s"
+                      % (k, len(out[k]), out[k][0].date, out[k][-1].date))
     return out
+
+
+# -- the text block's corpus, loaded once per process -------------------------
+
+_TEXT_CTX: dict | None = None
+
+
+def _text_ctx() -> dict:
+    """Statements, SEPs and the decision record, loaded lazily.
+
+    Lazily because derive reads data/decisions.json, which matrix.build writes
+    immediately before its first build_row call -- loading at import time would
+    read the previous build's record.
+    """
+    global _TEXT_CTX
+    if _TEXT_CTX is None:
+        import derive
+        import sep as sep_mod
+        import statements as st
+        _TEXT_CTX = {"derive": derive, "corpus": st.load(), "seps": sep_mod.load(),
+                     "deltas": derive._delta_by_date(), "path": derive._target_by_date()}
+    return _TEXT_CTX
+
+
+def refresh_text(verbose: bool = False) -> None:
+    """Re-harvest the Board's document index and pull any new statement / SEP.
+
+    Archived documents are cached forever; only the index pages are refetched,
+    so after a meeting this is a handful of requests.
+    """
+    global _TEXT_CTX
+    import index as ix
+    import sep as sep_mod
+    import statements as st
+    ix.refresh(verbose=verbose)
+    st._CACHE = None
+    sep_mod._CACHE = None
+    st.load(verbose=verbose)
+    sep_mod.load(verbose=verbose)
+    _TEXT_CTX = None
 
 
 # -- small helpers ----------------------------------------------------------
@@ -326,6 +433,45 @@ def build_row(data: dict, meeting: dict, path: list, prev_meeting: dict | None) 
             when, fred.shift_days(meeting["date"], 1))
         f["ff_p_cut"], f["ff_p_hike"] = ff_source.move_probability(when)
 
+    # ---- news tone + news-measured uncertainty ----
+    if NEWS:
+        ns, ep = data["_NEWS"], data["_EPU"]
+        f["news_sent"] = fred.avg_window(ns, when, 30)
+        f["news_sent_chg"] = _sub(f["news_sent"],
+                                  fred.avg_window(ns, fred.shift_days(when, -90), 30))
+        # Since the last meeting: what the news did while the Committee was away.
+        f["news_sent_intermeeting"] = _sub(fred.avg_window(ns, when, 14),
+                                           fred.avg_window(ns, prev_date, 14))
+        f["epu"] = _log(fred.avg_window(ep, when, 30))
+        f["epu_chg"] = _sub(f["epu"], _log(fred.avg_window(ep, fred.shift_days(when, -90), 30)))
+
+    # ---- the Committee's own words, published strictly before the meeting ----
+    if TEXT:
+        ctx = _text_ctx()
+        t = ctx["derive"].row(meeting["date"], corpus=ctx["corpus"], seps=ctx["seps"],
+                              deltas=ctx["deltas"], path=ctx["path"])
+        for c in TEXT_COLUMNS:
+            v = t.get(c)
+            f[c] = float(v) if v is not None else None
+
+    # ---- shocks: short windows against long ones ----
+    if SHOCK:
+        vix5, vix90 = fred.avg_window(data["VIXCLS"], when, 5), fred.avg_window(data["VIXCLS"], when, 90)
+        f["vix_spike"] = (vix5 / vix90) if vix5 and vix90 else None
+        f["equity_1m"] = _ret_days(data["NASDAQCOM"], when, 30)
+        baa = data["BAA10Y"]
+        f["credit_jump_1m"] = _sub(fred.avg_window(baa, when, 5),
+                                   fred.avg_window(baa, fred.shift_days(when, -30), 5))
+        f["nfci_chg_4w"] = _sub(_last(data["NFCI"], when),
+                                fred.value_n_back(data["NFCI"], when, 4))
+        f["oil_1m"] = _ret_days(data["DCOILWTICO"], when, 30)
+        ep = data["_EPU"]
+        e7, e365 = fred.avg_window(ep, when, 7), fred.avg_window(ep, when, 365)
+        f["epu_spike"] = _log(e7 / e365) if e7 and e365 else None
+        ns = data["_NEWS"]
+        f["news_shock"] = _sub(fred.avg_window(ns, when, 7), fred.avg_window(ns, when, 90))
+        f["shock_count"] = _shock_count(f)
+
     # ---- meeting context ----
     f["is_sep"] = 1.0 if meeting.get("sep") else 0.0
     f["days_since_prev"] = float(
@@ -337,6 +483,44 @@ def build_row(data: dict, meeting: dict, path: list, prev_meeting: dict | None) 
 def _d(iso: str):
     from datetime import date
     return date.fromisoformat(iso)
+
+
+def _log(v):
+    import math
+    return math.log(v) if v is not None and v > 0 else None
+
+
+def _ret_days(obs, when, days):
+    """Percent change from the last print `days` ago to the last print now.
+
+    Point to point, not averaged: a shock is the thing an average smooths away.
+    """
+    a = fred.latest_as_of(obs, when)
+    b = fred.latest_as_of(obs, fred.shift_days(when, -days))
+    if a is None or b is None or b.value <= 0:
+        return None
+    return (a.value / b.value - 1) * 100
+
+
+# Trip-wires for shock_count. Each is a level a desk would call a shock, fixed
+# in advance rather than fitted -- fitting thresholds on 36 years that contain
+# five genuine shocks would be fitting the shocks. The news threshold is ~2.5 sd
+# (sd 0.081) of the weekly 7d-vs-90d gap over 1985-2026 -- its 1st percentile,
+# measured when the block was added.
+SHOCK_TRIPS = {
+    "vix_spike": lambda v: v >= 1.5,        # 5-day VIX 50% above its 90-day mean
+    "equity_1m": lambda v: v <= -10.0,      # a 10% monthly equity drawdown
+    "credit_jump_1m": lambda v: v >= 0.40,  # Baa spread +40bp in a month
+    "nfci_chg_4w": lambda v: v >= 0.30,     # conditions tighten 0.3 sd in 4 weeks
+    "oil_1m": lambda v: abs(v) >= 25.0,     # oil +/-25% in a month
+    "epu_spike": lambda v: v >= 0.69,       # uncertainty double its 1-year mean
+    "news_shock": lambda v: v <= -0.20,     # news tone collapse
+}
+
+
+def _shock_count(f: dict) -> float:
+    return float(sum(1 for k, trip in SHOCK_TRIPS.items()
+                     if f.get(k) is not None and trip(f[k])))
 
 
 def _pct_change_days(obs, when, days):

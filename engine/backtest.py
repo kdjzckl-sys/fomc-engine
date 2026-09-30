@@ -53,8 +53,7 @@ import model as M
 import features
 
 HERE = Path(__file__).resolve().parent
-OUT = HERE / "models" / ("backtest.json" if features.FUTURES
-                         else "backtest.noff.json")
+OUT = HERE / "models" / features.artifact("backtest")
 
 # The futures baseline is scored in BOTH builds, including --no-futures. A
 # baseline is a property of the meetings, not of the feature set the model was

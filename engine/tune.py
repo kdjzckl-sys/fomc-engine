@@ -42,8 +42,7 @@ HERE = Path(__file__).resolve().parent
 # Same rule as the matrix and the scorecard: a --no-futures sweep is a
 # different feature set and gets its own artefact rather than overwriting the
 # default one.
-OUT = HERE / "models" / ("tuning.json" if features.FUTURES
-                         else "tuning.noff.json")
+OUT = HERE / "models" / features.artifact("tuning")
 
 BLOCKS = {
     "market": ["mkt_", "slope_", "d_2y", "credit_", "vix", "nfci", "equity_", "oil_"],

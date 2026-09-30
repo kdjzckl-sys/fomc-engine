@@ -9,8 +9,10 @@ engine/data/cache/
 
 # Comparison artefacts: `--no-futures` writes these so the futures claim stays
 # falsifiable in one command. They are outputs, not inputs.
-engine/data/matrix.noff.json
-engine/models/*.noff.json
+# The same for every block toggle (--no-news, --no-text, ...): any tagged
+# artefact is a comparison run, never a published one.
+engine/data/matrix.*.json
+engine/models/*.*.json
 
 __pycache__/
 *.pyc

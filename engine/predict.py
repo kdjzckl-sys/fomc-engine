@@ -32,8 +32,7 @@ import model as M
 import features
 
 HERE = Path(__file__).resolve().parent
-CURRENT = HERE / "models" / ("current.json" if features.FUTURES
-                             else "current.noff.json")
+CURRENT = HERE / "models" / features.artifact("current")
 
 
 def train(l2: float = 2.0, half_life: float = 12.0, epochs: int = 1200,

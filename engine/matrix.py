@@ -23,7 +23,7 @@ HERE = Path(__file__).resolve().parent
 # Turning the futures block off changes the column set, so that build gets its
 # own artefact. Sharing one file would let a --no-futures build silently replace
 # the matrix the published scorecard was computed on.
-OUT = HERE / "data" / ("matrix.json" if features.FUTURES else "matrix.noff.json")
+OUT = HERE / "data" / features.artifact("matrix")
 
 
 def build(refresh: bool = False, verbose: bool = True) -> dict:
