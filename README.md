@@ -133,12 +133,56 @@ worst look-ahead leak available to this project.
 
 ---
 
+## Beyond the macro panel: news, Fed text, shocks
+
+Three more blocks are built, point-in-time, tested for leaks — and **off by default**,
+because the walk-forward record says they do not earn it yet.
+
+| block | columns | source | switch |
+|---|---|---|---|
+| news | tone level, 90-day change, change since last meeting; policy uncertainty level + change | SF Fed Daily News Sentiment (1980–), Baker-Bloom-Davis EPU (`USEPUINDXD`, 1985–) | `--with-news` |
+| text | dot-plot revisions, dots minus the target, risk-tilt change, redline size, net dissent direction | the **prior** statement and SEP only (`engine/text/`) | `--with-text` |
+| shock | 5d/90d VIX, 1-month equity and oil moves, 1-month Baa jump, 4-week NFCI change, EPU spike, news-tone collapse, count of tripped gauges | the series above | `--with-shock` |
+
+News sentiment is stamped public 10 days after the day it describes (the index is weekly
+with a ~3-day lag, so this is the worst case). The SF Fed re-estimates its history on each
+update, so the historical values are today's vintage — the same compromise as the
+non-vintage market series. The text block uses exactly the six columns `engine/text/README.md`
+measured as surviving the persistence control; the hawk/dove lexicon is left out because it
+mostly re-reads the last decision.
+
+**What they bought**, 233 meetings, walk-forward, measured 2026-09-30:
+
+| | 5-class | direction | log loss | direction on moves | false alarms |
+|---|---|---|---|---|---|
+| **published** (macro + futures), L2 2 | 82.4% | 84.5% | **0.491** | 64.4% | 6.3% |
+| + news + shock, L2 2 | **84.1%** | **87.1%** | 0.517 | 68.5% | **4.4%** |
+| + news + shock, L2 4 | 82.8% | 85.8% | 0.498 | 67.1% | 5.6% |
+| + news + shock + text, L2 2 | 83.3% | 85.8% | 0.527 | 68.5% | 6.3% |
+| + news + shock + text, L2 4 | 83.3% | 85.8% | 0.502 | 67.1% | 5.6% |
+
+More meetings called right — up to six on direction — and a third fewer false alarms. But
+**every configuration makes the probabilities worse**, and no regularisation strength tested
+(2/4/8/16) closes that gap: tightening L2 recovers log loss only by giving the accuracy back.
+The engine's output is a probability, and six meetings in 233 is inside the noise. Futures
+shipped because they improved every metric at once; these do not, so they stay switchable
+rather than published. Text adds nothing on top of news + shock — the futures strip already
+prices what the prior statement said.
+
+Reproduce any row: `python cli.py all --with-news --with-shock --l2=4`. Every non-published
+configuration writes to its own tagged artefacts (`backtest.withnews-withshock.json`) and
+cannot overwrite the scorecard.
+
+---
+
 ## What it cannot do
 
-- **It has no text.** Statement language, the dot plot, speeches and the press conference
-  are often the whole story at an ambiguous meeting. None of it is in the feature set.
-- **It cannot see a shock.** March 2020 is in the training data as a label; nothing in the
-  features would have called it on March 1st.
+- **It cannot read the meeting's own text.** Statement language, the press conference and
+  speeches are often the whole story at an ambiguous meeting. The prior statement and dots
+  are available as a block (above) and measured; the live meeting's words are not, by
+  construction.
+- **It still cannot see a shock coming.** The shock block reads stress once it is in the
+  tape; nothing would have called March 2020 on March 1st.
 - **The futures column is degenerate at the zero bound.** ZQ settles to the effective rate,
   which had already collapsed to ~14 bp by December 2008 — so the strip priced no cut into
   a 75 bp cut.
@@ -155,6 +199,8 @@ worst look-ahead leak available to this project.
 engine/          the model. Python, no dependencies
   fred.py        FRED/ALFRED client: vintages, splicing, point-in-time lookups
   futures.py     the reconstructed ZQ strip + option-implied probabilities
+  news.py        news sentiment + news-based policy uncertainty
+  text/          statements and dot plots, strictly point-in-time
   features.py    the reaction function as point-in-time columns
   model.py       ordered logit (proportional odds)
   backtest.py    walk-forward validation and baselines
@@ -171,3 +217,11 @@ web view and the command line can never disagree about what the Fed is going to 
 ```bash
 cd web && npm install && npm run build && npm start   # → localhost:3050
 ```
+
+**Staying current.** The deployed dashboard reads `web/data/snapshot.json`, because a
+serverless host has no Python and no FRED key. `.github/workflows/refresh.yml` regenerates
+it every weekday at 22:30 UTC (after the close and the day's prints) and on Sundays (the
+SF Fed's weekly sentiment update): full fetch → build → train → backtest → tests →
+snapshot → commit. The Vercel project is git-connected with root `web/`, so that commit
+is the deploy. `generated_at` is rendered on the page — a stalled job shows as a stale date,
+never as a live forecast. Needs one repo secret, `FRED_API_KEY`.
