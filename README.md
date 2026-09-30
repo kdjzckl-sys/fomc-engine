@@ -85,6 +85,41 @@ fitted on the reaction function rather than on the price. The futures strip tell
 what is priced and nothing about why. Read the model as a structured argument with the
 market, not as an edge over it.
 
+### Who carries the headline: the market handoff
+
+The scorecard reads everything the evening before a meeting. The dashboard forecasts
+weeks out. So `cli.py horizon` re-reads every scored meeting N days before it opens
+(macro data and futures strip alike, point-in-time), asks the walk-forward model about
+it from there, and sets that against what the strip priced the same day. A meeting is
+scored at N days only if it was already the next meeting then.
+
+| days out | meetings | model | futures | on moves: model / futures | false alarms: model / futures |
+|---|---|---|---|---|---|
+| 1 | 196 | 84.7% | **90.8%** | 64.6% / 83.1% | 5.3% / 5.3% |
+| 7 | 187 | 84.0% | **95.7%** | 62.3% / 95.1% | 5.6% / 4.0% |
+| 14 | 164 | 86.6% | 88.4% | 62.0% / 86.0% | 2.6% / 10.5% |
+| 21 | 132 | 84.8% | 87.1% | 57.9% / 81.6% | 4.3% / 10.6% |
+| 28 | 130 | 85.4% | 86.2% | 55.6% / 91.7% | 3.2% / 16.0% |
+| 42 | 67 | 83.6% | 83.6% | 50.0% / 77.8% | 4.1% / 14.3% |
+
+The 1-day row reproduces the scorecard exactly, which is the check that the harness is
+the backtest and not a cousin of it. The rule was written before the table: the market
+takes the headline at horizons where, on the same meetings, it called direction more
+often than the model, out to the last horizon where that holds without a break. That is
+**28 days** (`handoff_days` in `engine/models/horizon.json`), and nothing else in the
+repo hard-codes it. `predict --json` carries the market read (FedWatch arithmetic on the
+strip, same ±12.5bp band as the scorecard), the model read, and a `handoff` block with
+`headline_source` and a one-line reason. The dashboard shows both side by side and
+flips the headline. With no strip reading for the meeting, the headline stays on the
+model and says the feed is missing.
+
+**Read the table, not just the flag.** The market's edge is decisive inside a week.
+From 14 to 28 days out it is one to three meetings, bought with three to five times the
+model's false alarms on holds. The option-implied `ff_p_cut` / `ff_p_hike` ride along
+but are not this meeting's odds; they cover the nearest SOFR-option window. The horizon
+run takes ~8 minutes and is not in the daily refresh: rerun it after `cli.py all` when
+the sample or the model changes.
+
 ---
 
 ## The three things that make it honest
