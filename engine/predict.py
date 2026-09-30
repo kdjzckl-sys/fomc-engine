@@ -115,7 +115,106 @@ def forecast(meeting: dict | None = None, refresh: bool = False) -> dict:
         "model": {"trained": meta["trained"], "n_meetings": meta["n_meetings"],
                   "train_to": meta["train_to"]},
         "as_of": datetime.now().isoformat(timespec="seconds"),
+        **market_handoff(mt, (p_cut, p_hold, p_hike)),
     }
+
+
+def market_read(mt: dict) -> dict:
+    """What the fed funds futures strip prices for this meeting, as of today.
+
+    The meeting-specific probabilities are the FedWatch two-outcome arithmetic on
+    the strip's expected move -- the same quantity backtest.py scores, and the
+    call uses the same +-12.5bp band, so "market says hike" here means exactly
+    what it means in the scorecard. ff_p_cut / ff_p_hike (Atlanta Fed, option-
+    implied) are carried beside it but are NOT this meeting's odds: they describe
+    the nearest SOFR-option window, which can be months away.
+    """
+    import backtest as bt
+    import fred
+    import futures
+
+    out = {"exp_move_bp": None, "source": "none", "p_cut": None, "p_hold": None,
+           "p_hike": None, "call": None, "options_implied": None}
+    try:
+        bp, src = futures.expected_move_bp(fred.shift_days(mt["start"], -1),
+                                           fred.shift_days(mt["date"], 1))
+        pc, ph = futures.move_probability(fred.shift_days(mt["start"], -1))
+    except Exception:  # noqa: BLE001 - an upstream feed, degrade to null
+        return out
+    out["options_implied"] = ({"p_cut": pc, "p_hike": ph,
+                               "note": "nearest SOFR-option window, not this meeting"}
+                              if pc is not None or ph is not None else None)
+    # A proxy is not the market. Only the real strip counts here, as in the
+    # scorecard, so a proxy-only reading shows as a missing market feed.
+    if bp is None or src != "futures":
+        return out
+    move = min(abs(bp) / 25.0, 1.0)
+    out.update({
+        "exp_move_bp": bp, "source": src,
+        "p_cut": move if bp < 0 else 0.0,
+        "p_hold": 1.0 - move,
+        "p_hike": move if bp > 0 else 0.0,
+        "call": {1: "hike", -1: "cut", 0: "hold"}[
+            bt._futures_call({"ff_priced_bp": bp, "ff_source": src})],
+    })
+    return out
+
+
+def market_handoff(mt: dict, model_dir: tuple) -> dict:
+    """Who carries the headline for this meeting: the model or the market.
+
+    Decided by horizon.py's measured record, never by a constant typed here: the
+    market takes the headline when the meeting is within `handoff_days` of
+    opening, because at those horizons it called direction more often than the
+    model on the same meetings. It stays with the model when the market feed is
+    missing or the handoff was never measured -- a missing input must not flip
+    the headline to a number that is not there.
+    """
+    import horizon
+
+    mkt = market_read(mt)
+    start = date.fromisoformat(mt.get("start") or mt["date"])
+    h_live = (start - date.today()).days
+    rec = horizon.load()
+    ho = {
+        "horizon_days": h_live,
+        "days_to_meeting": (date.fromisoformat(mt["date"]) - date.today()).days,
+        "handoff_days": None, "handoff_date": None,
+        "headline_source": "model", "reason": None, "measured": None,
+        "at_horizon": None,
+    }
+    cut, hold, hike = model_dir
+    model_call = max((cut, "cut"), (hold, "hold"), (hike, "hike"))[1]
+
+    if rec is None:
+        ho["reason"] = "handoff unmeasured -- run: python cli.py horizon"
+        return {"market": mkt, "model_call": model_call, "handoff": ho}
+
+    hd = rec.get("handoff_days") or 0
+    rows = rec.get("horizons") or []
+    ho["handoff_days"] = hd
+    ho["measured"] = rows
+    ho["handoff_date"] = (date.fromordinal(start.toordinal() - hd).isoformat()
+                          if hd else None)
+    # the measured row that covers today's distance: the nearest one at or beyond it
+    cover = next((r for r in rows if r["horizon_days"] >= max(h_live, 1)), None)
+    ho["at_horizon"] = cover
+
+    if mkt["call"] is None:
+        ho["reason"] = "market feed missing -- the futures strip does not reach this meeting today"
+    elif hd and h_live <= hd and cover is not None:
+        ho["headline_source"] = "market"
+        diff = round((cover["market_direction"] - cover["model_direction"]) * cover["n"])
+        ho["reason"] = ("%d days out, the futures strip called direction on %.1f%% of %d "
+                        "meetings against the model's %.1f%% (%d more right)"
+                        % (cover["horizon_days"], 100 * cover["market_direction"],
+                           cover["n"], 100 * cover["model_direction"], diff))
+    else:
+        ho["reason"] = ("more than %d days out, the market has not beaten the model "
+                        "on direction; it takes the headline on %s"
+                        % (hd, ho["handoff_date"])) if hd else (
+                        "the market did not beat the model at any measured horizon")
+    return {"market": mkt, "model_call": model_call, "handoff": ho}
 
 
 def path_forecast(n: int = 4, refresh: bool = False) -> list[dict]:

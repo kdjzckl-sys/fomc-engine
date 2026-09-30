@@ -1,0 +1,92 @@
+{
+ "built": "2026-09-30T16:35:21",
+ "rule": "market takes the headline at horizons where, on the same meetings, it called direction more often than the model; handoff_days is the longest horizon out to which that holds at every measured horizon",
+ "band_bp": 12.5,
+ "horizons": [
+  {
+   "horizon_days": 1,
+   "n_scored": 233,
+   "model_direction_all": 0.8454935622317596,
+   "n": 196,
+   "n_moves": 65,
+   "n_holds": 131,
+   "model_direction": 0.8469387755102041,
+   "market_direction": 0.9081632653061225,
+   "model_move_direction": 0.6461538461538462,
+   "market_move_direction": 0.8307692307692308,
+   "model_false_alarm": 0.05343511450381679,
+   "market_false_alarm": 0.05343511450381679
+  },
+  {
+   "horizon_days": 7,
+   "n_scored": 232,
+   "model_direction_all": 0.8362068965517241,
+   "n": 187,
+   "n_moves": 61,
+   "n_holds": 126,
+   "model_direction": 0.839572192513369,
+   "market_direction": 0.9572192513368984,
+   "model_move_direction": 0.6229508196721312,
+   "market_move_direction": 0.9508196721311475,
+   "model_false_alarm": 0.05555555555555555,
+   "market_false_alarm": 0.03968253968253968
+  },
+  {
+   "horizon_days": 14,
+   "n_scored": 224,
+   "model_direction_all": 0.84375,
+   "n": 164,
+   "n_moves": 50,
+   "n_holds": 114,
+   "model_direction": 0.8658536585365854,
+   "market_direction": 0.8841463414634146,
+   "model_move_direction": 0.62,
+   "market_move_direction": 0.86,
+   "model_false_alarm": 0.02631578947368421,
+   "market_false_alarm": 0.10526315789473684
+  },
+  {
+   "horizon_days": 21,
+   "n_scored": 218,
+   "model_direction_all": 0.8119266055045872,
+   "n": 132,
+   "n_moves": 38,
+   "n_holds": 94,
+   "model_direction": 0.8484848484848485,
+   "market_direction": 0.8712121212121212,
+   "model_move_direction": 0.5789473684210527,
+   "market_move_direction": 0.8157894736842105,
+   "model_false_alarm": 0.0425531914893617,
+   "market_false_alarm": 0.10638297872340426
+  },
+  {
+   "horizon_days": 28,
+   "n_scored": 215,
+   "model_direction_all": 0.827906976744186,
+   "n": 130,
+   "n_moves": 36,
+   "n_holds": 94,
+   "model_direction": 0.8538461538461538,
+   "market_direction": 0.8615384615384616,
+   "model_move_direction": 0.5555555555555556,
+   "market_move_direction": 0.9166666666666666,
+   "model_false_alarm": 0.031914893617021274,
+   "market_false_alarm": 0.1595744680851064
+  },
+  {
+   "horizon_days": 42,
+   "n_scored": 106,
+   "model_direction_all": 0.8113207547169812,
+   "n": 67,
+   "n_moves": 18,
+   "n_holds": 49,
+   "model_direction": 0.835820895522388,
+   "market_direction": 0.835820895522388,
+   "model_move_direction": 0.5,
+   "market_move_direction": 0.7777777777777778,
+   "model_false_alarm": 0.04081632653061224,
+   "market_false_alarm": 0.14285714285714285
+  }
+ ],
+ "handoff_days": 28
+}

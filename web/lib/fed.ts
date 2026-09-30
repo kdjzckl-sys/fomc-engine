@@ -68,6 +68,49 @@ export interface Forecast {
   drivers_tightening: Driver[];
   drivers_easing: Driver[];
   model: { trained: string; n_meetings: number; train_to: string };
+  /** What the futures strip prices for this meeting. Absent on older snapshots. */
+  market?: MarketRead;
+  model_call?: "cut" | "hold" | "hike";
+  /** Who carries the headline, decided by engine/horizon.py's measured record. */
+  handoff?: Handoff;
+}
+
+/**
+ * The fed funds futures read for one meeting (engine/predict.py `market_read`).
+ * p_* are the FedWatch two-outcome arithmetic on `exp_move_bp` -- the same
+ * quantity the scorecard grades. `options_implied` is the Atlanta Fed option
+ * read and is NOT this meeting's odds; it covers the nearest option window.
+ */
+export interface MarketRead {
+  exp_move_bp: number | null;
+  source: string;
+  p_cut: number | null;
+  p_hold: number | null;
+  p_hike: number | null;
+  call: "cut" | "hold" | "hike" | null;
+  options_implied: { p_cut: number | null; p_hike: number | null; note: string } | null;
+}
+
+export interface HorizonRow {
+  horizon_days: number;
+  n: number;
+  model_direction: number | null;
+  market_direction: number | null;
+  model_move_direction: number | null;
+  market_move_direction: number | null;
+  model_false_alarm: number | null;
+  market_false_alarm: number | null;
+}
+
+export interface Handoff {
+  horizon_days: number;
+  days_to_meeting: number;
+  handoff_days: number | null;
+  handoff_date: string | null;
+  headline_source: "model" | "market";
+  reason: string | null;
+  measured: HorizonRow[] | null;
+  at_horizon: HorizonRow | null;
 }
 
 /**

@@ -294,9 +294,16 @@ def _sahm_gap(unrate, when) -> float | None:
 # -- the feature vector -----------------------------------------------------
 
 
-def build_row(data: dict, meeting: dict, path: list, prev_meeting: dict | None) -> dict:
-    """One meeting -> one feature dict. `when` is the day the meeting opens."""
-    when = fred.shift_days(meeting["start"], -1)
+def build_row(data: dict, meeting: dict, path: list, prev_meeting: dict | None,
+              asof: str | None = None) -> dict:
+    """One meeting -> one feature dict, as of the evening before the meeting opens.
+
+    `asof` moves that reading date earlier, and nothing else: the row is what the
+    engine would have seen `asof`, still describing the same meeting. horizon.py
+    uses it to score the model N days out, which is how a live forecast weeks
+    ahead of a meeting is actually made.
+    """
+    when = asof or fred.shift_days(meeting["start"], -1)
     f: dict[str, float | None] = {}
 
     # ---- policy state ----

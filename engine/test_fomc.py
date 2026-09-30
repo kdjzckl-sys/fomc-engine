@@ -239,6 +239,46 @@ def main():
     else:
         print("  SKIP  no trained model at %s (run: python cli.py train)" % predict.CURRENT.name)
 
+    print("\nmarket handoff")
+    import horizon
+    hz = horizon.load()
+    if hz is None:
+        print("  SKIP  no horizon record (run: python cli.py horizon)")
+    else:
+        rows = {r["horizon_days"]: r for r in hz["horizons"]}
+        # The 1-day reading IS the published eve-of-meeting read, so it has to
+        # reproduce the scorecard's futures column exactly.
+        bt_path = predict.HERE / "models" / features.artifact("backtest")
+        if 1 in rows and bt_path.exists():
+            ff = next(r for r in json.loads(bt_path.read_text(encoding="utf-8"))
+                      ["move_subset"]["rows"] if r["key"] == "market_futures")
+            check("1-day horizon reproduces the scorecard's futures coverage",
+                  rows[1]["n"] == ff["n"], "%s vs %s" % (rows[1]["n"], ff["n"]))
+            check("1-day horizon reproduces the scorecard's futures accuracy",
+                  abs(rows[1]["market_direction"] - ff["all_direction"]) < 1e-9)
+        hd = hz["handoff_days"]
+        check("handoff_days is a measured horizon or 0", hd == 0 or hd in rows)
+        check("market beats the model at every horizon inside the handoff",
+              all(r["market_direction"] > r["model_direction"]
+                  for h, r in rows.items() if h <= hd))
+        # A meeting three days out is inside any handoff; with the feed gone the
+        # headline must still stay on the model rather than show a blank market.
+        from datetime import date, timedelta
+        soon = date.today() + timedelta(days=3)
+        mt = {"date": (soon + timedelta(days=1)).isoformat(), "start": soon.isoformat()}
+        orig = predict.market_read
+        try:
+            predict.market_read = lambda _mt: {"call": None}
+            check("missing market feed keeps the headline on the model",
+                  predict.market_handoff(mt, (0.1, 0.2, 0.7))["handoff"]
+                  ["headline_source"] == "model")
+            predict.market_read = lambda _mt: {"call": "hold"}
+            check("inside the handoff with a live feed, the market takes the headline",
+                  predict.market_handoff(mt, (0.1, 0.2, 0.7))["handoff"]
+                  ["headline_source"] == ("market" if hd >= 3 else "model"))
+        finally:
+            predict.market_read = orig
+
     print("\n%s" % ("ALL PASS" if not FAIL else "FAILED: " + ", ".join(FAIL)))
     return 1 if FAIL else 0
 

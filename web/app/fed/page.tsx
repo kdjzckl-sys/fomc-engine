@@ -89,8 +89,8 @@ export default async function FedPage() {
               , not a live read.
             </p>
             <p className="mt-1 text-xs text-[var(--text-faint)]">
-              Incoming data since then is not in this page. Inside two weeks of a
-              meeting, live fed funds futures pricing is the better read.
+              Incoming data since then is not in this page, and the futures read below
+              is that day&apos;s pricing, not today&apos;s.
             </p>
           </div>
         )}
@@ -114,8 +114,13 @@ export default async function FedPage() {
                 </span>
               </div>
 
-              <div className="grid gap-6 md:grid-cols-[1.4fr_1fr]">
+              {f.handoff ? <Headline f={f} /> : null}
+
+              <div className="grid gap-6 md:grid-cols-2">
                 <Panel className="p-5">
+                  <h3 className="mb-3 text-xs uppercase tracking-wider text-[var(--text-dim)]">
+                    model{f.handoff?.headline_source === "model" ? " · headline" : ""}
+                  </h3>
                   {Object.entries(f.probs ?? {}).map(([name, p]) => (
                     <ProbBar key={name} name={name} p={p} />
                   ))}
@@ -130,25 +135,26 @@ export default async function FedPage() {
                       P(hike) <b className="text-[var(--urgent)]">{pct(f.p_hike)}</b>
                     </span>
                   </div>
-                </Panel>
-
-                <Panel className="p-5 font-mono text-sm">
-                  <Stat label="current target (upper)" value={`${fx(f.current_target_upper)}%`} />
-                  <Stat
-                    label="expected move"
-                    value={`${f.expected_bp >= 0 ? "+" : "−"}${Math.abs(
-                      f.expected_bp,
-                    ).toFixed(1)} bp`}
-                    tone={f.expected_bp > 2 ? "up" : f.expected_bp < -2 ? "down" : undefined}
-                  />
-                  <Stat label="implied target" value={`${fx(f.implied_target_upper)}%`} />
+                  <div className="mt-3 font-mono text-sm">
+                    <Stat label="current target (upper)" value={`${fx(f.current_target_upper)}%`} />
+                    <Stat
+                      label="expected move"
+                      value={bp(f.expected_bp)}
+                      tone={f.expected_bp > 2 ? "up" : f.expected_bp < -2 ? "down" : undefined}
+                    />
+                    <Stat label="implied target" value={`${fx(f.implied_target_upper)}%`} />
+                  </div>
                   <p className="mt-4 border-t border-[var(--accent-edge)] pt-3 text-[11px] leading-relaxed text-[var(--text-faint)]">
                     Read the probability, not the argmax. The expected move is the
                     distribution&apos;s mean in basis points, not a prediction that the Fed will
                     move by that amount — the Committee only chooses in 25bp steps.
                   </p>
                 </Panel>
+
+                <MarketPanel f={f} />
               </div>
+
+              {f.handoff?.measured ? <HorizonTable h={f.handoff} /> : null}
             </section>
 
             {/* ── the record, always next to its baselines ─────────────── */}
@@ -715,6 +721,138 @@ function Coefficients({ rows }: { rows: Coefficient[] | null }) {
 }
 
 /* ── pieces ─────────────────────────────────────────────────────────────── */
+
+type Fc = NonNullable<FedBundle["forecast"]>;
+
+const bp = (v: number | null | undefined) =>
+  v == null || !Number.isFinite(v) ? "—" : `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(1)} bp`;
+
+/**
+ * The headline: the model's call or the market's, whichever the measured record
+ * says to trust at this distance from the meeting. The choice and its reason are
+ * computed by engine/predict.py from engine/models/horizon.json. This renders
+ * them and does not decide them, so the CLI and the page cannot disagree.
+ */
+function Headline({ f }: { f: Fc }) {
+  const h = f.handoff!;
+  const market = h.headline_source === "market";
+  const src = market
+    ? { call: f.market?.call ?? null, cut: f.market?.p_cut, hold: f.market?.p_hold, hike: f.market?.p_hike }
+    : { call: f.model_call ?? null, cut: f.p_cut, hold: f.p_hold, hike: f.p_hike };
+  const p = src.call === "hike" ? src.hike : src.call === "cut" ? src.cut : src.hold;
+  const tone =
+    src.call === "hike"
+      ? "text-[var(--urgent)]"
+      : src.call === "cut"
+        ? "text-[var(--ok)]"
+        : "text-[var(--text)]";
+  const disagree = f.market?.call && f.model_call && f.market.call !== f.model_call;
+  return (
+    <Panel className="mb-6 p-5">
+      <p className="text-[11px] uppercase tracking-wider text-[var(--text-faint)]">
+        headline · {market ? "fed funds futures" : "the model"}
+      </p>
+      <p className="mt-1 text-2xl font-semibold">
+        <span className={tone}>{src.call ?? "—"}</span>{" "}
+        <span className="font-mono text-base text-[var(--text-dim)]">{pct(p ?? null)}</span>
+      </p>
+      {h.reason ? <p className="mt-2 text-xs text-[var(--text-dim)]">{h.reason}.</p> : null}
+      {disagree ? (
+        <p className="mt-1 text-xs text-[var(--accent)]">
+          The two disagree: the model says {f.model_call}, the market prices {f.market!.call}.
+        </p>
+      ) : null}
+    </Panel>
+  );
+}
+
+function MarketPanel({ f }: { f: Fc }) {
+  const m = f.market;
+  if (!m || m.call === null) {
+    return (
+      <Panel className="p-5">
+        <h3 className="mb-3 text-xs uppercase tracking-wider text-[var(--text-dim)]">
+          fed funds futures
+        </h3>
+        <p className="text-xs text-[var(--text-dim)]">
+          Market feed missing: the futures strip does not reach this meeting in this read, so the
+          headline stays with the model.
+        </p>
+      </Panel>
+    );
+  }
+  return (
+    <Panel className="p-5">
+      <h3 className="mb-3 text-xs uppercase tracking-wider text-[var(--text-dim)]">
+        fed funds futures{f.handoff?.headline_source === "market" ? " · headline" : ""}
+      </h3>
+      <ProbBar name="cut" p={m.p_cut ?? 0} />
+      <ProbBar name="hold" p={m.p_hold ?? 0} />
+      <ProbBar name="hike" p={m.p_hike ?? 0} />
+      <div className="mt-3 font-mono text-sm">
+        <Stat label="priced move" value={bp(m.exp_move_bp)} />
+        <Stat label="call (±12.5bp band)" value={m.call ?? "—"} />
+      </div>
+      <p className="mt-4 border-t border-[var(--accent-edge)] pt-3 text-[11px] leading-relaxed text-[var(--text-faint)]">
+        CME ZQ strip through the FedWatch arithmetic, the same number the scorecard grades.
+        {m.options_implied ? (
+          <>
+            {" "}
+            Options (Atlanta Fed) put P(hike) at {pct(m.options_implied.p_hike)} and P(cut) at{" "}
+            {pct(m.options_implied.p_cut)}, but over the nearest option window, not this meeting.
+          </>
+        ) : null}
+      </p>
+    </Panel>
+  );
+}
+
+/** The measured record the handoff is decided on, cited rather than asserted. */
+function HorizonTable({ h }: { h: NonNullable<Fc["handoff"]> }) {
+  const rows = h.measured ?? [];
+  return (
+    <div className="mt-6 overflow-x-auto">
+      <table className="w-full font-mono text-xs">
+        <caption className="mb-2 text-left text-[11px] text-[var(--text-faint)]">
+          Direction called, walk-forward, by days before the meeting opens, on the meetings the
+          strip reached that day. Recall on moves and false alarms on holds read together.
+        </caption>
+        <thead className="text-[var(--text-faint)]">
+          <tr>
+            <th scope="col" className="pb-1 text-left font-normal">days out</th>
+            <th scope="col" className="pb-1 text-right font-normal">n</th>
+            <th scope="col" className="pb-1 text-right font-normal">model</th>
+            <th scope="col" className="pb-1 text-right font-normal">market</th>
+            <th scope="col" className="pb-1 text-right font-normal">moves m / mkt</th>
+            <th scope="col" className="pb-1 text-right font-normal">false alarm m / mkt</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => {
+            const here = h.at_horizon?.horizon_days === r.horizon_days;
+            return (
+              <tr key={r.horizon_days} className={here ? "text-[var(--accent)]" : undefined}>
+                <td className="py-1">
+                  {r.horizon_days}
+                  {here ? " ← now" : ""}
+                </td>
+                <td className="py-1 text-right tabular-nums">{r.n}</td>
+                <td className="py-1 text-right tabular-nums">{pct(r.model_direction)}</td>
+                <td className="py-1 text-right tabular-nums">{pct(r.market_direction)}</td>
+                <td className="py-1 text-right tabular-nums">
+                  {pct(r.model_move_direction)} / {pct(r.market_move_direction)}
+                </td>
+                <td className="py-1 text-right tabular-nums">
+                  {pct(r.model_false_alarm)} / {pct(r.market_false_alarm)}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 function ProbBar({ name, p }: { name: string; p: number }) {
   const tone = name.startsWith("cut")

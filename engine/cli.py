@@ -8,6 +8,8 @@
                                  it cost, with every baseline beside them
     python cli.py tune           sweep L2 / half-life / feature blocks, walk-forward
     python cli.py predict        the next scheduled meeting
+    python cli.py horizon        model vs futures by days-to-meeting; sets the
+                                 market handoff the headline follows (~8 min)
     python cli.py path [--n=4]   the next N meetings, conditional on today's data
     python cli.py coefficients   the fitted reaction function, signed
     python cli.py provenance     where vintage data starts, per series
@@ -154,6 +156,13 @@ def main() -> int:
                          100 * f["p_hike"], f["expected_bp"],
                          f["implied_target_upper"] or 0))
 
+    elif cmd == "horizon":
+        import horizon
+        r = horizon.run(epochs=int(_flag("epochs", 400)), verbose=not as_json)
+        horizon.OUT.parent.mkdir(parents=True, exist_ok=True)
+        horizon.OUT.write_text(json.dumps(r, indent=1), encoding="utf-8")
+        print(json.dumps(r, indent=1) if as_json else "  written: %s" % horizon.OUT)
+
     elif cmd == "coefficients":
         import predict
         pairs = predict.coefficients(int(_flag("n", 25)))
@@ -228,7 +237,7 @@ def main() -> int:
                          r["target_before"], r["target_after"],
                          "" if r["scheduled"] else "UNSCHEDULED"))
 
-    elif cmd not in ("fetch", "build", "train", "backtest", "predict", "all"):
+    elif cmd not in ("fetch", "build", "train", "backtest", "predict", "all", "horizon"):
         print(__doc__)
         return 2
     return 0

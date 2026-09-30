@@ -204,6 +204,7 @@ engine/          the model. Python, no dependencies
   features.py    the reaction function as point-in-time columns
   model.py       ordered logit (proportional odds)
   backtest.py    walk-forward validation and baselines
+  horizon.py     model vs futures by days-to-meeting; sets the market handoff
   cli.py         front door
 web/             Next.js dashboard — calibration, baselines, attribution
 ```
