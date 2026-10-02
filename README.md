@@ -161,6 +161,26 @@ Wiring it beat the yield-spread proxy it replaced on every metric — 5-class ac
 on by default. `--no-futures` rebuilds the old feature set into `*.noff` artefacts, which
 can never overwrite the published ones, so the claim stays falsifiable in one command.
 
+### The CME watch: the priced path
+
+`cli.py watch` (and the "CME watch" section on the dashboard) is FedWatch rebuilt on the
+same strip: every upcoming meeting is read off its own listed ZQ contract, the priced move
+is split across the two 25bp outcomes that bracket it, and the splits are chained into a
+probability for each target range after each meeting. Row one is the number the scorecard
+grades (`test_fomc.py` holds it to that); later rows start from an anchor month's contract
+where one exists, as CME does.
+
+It is a different object from `cli.py path`: `path` is the **model** re-run on today's
+data and is not a rate path; `watch` is the **market**, and it is one — the priced path.
+Two-outcome splitting assumes a shape the futures mean does not carry, so each run sets
+the Atlanta Fed's SOFR-option read beside it. On 2026-10-02 they agreed at the front
+(P(above 375–400) by mid-December: futures 85.7%, options 87.3%) and parted further out,
+where options carry an 8–14% cut tail the split cannot express.
+
+Live per-contract quotes take precedence over Yahoo's continuous `ZQ=F`, which rolls
+early: on 2026-10-02 it printed the November contract while stamped October. That changed
+no historical feature (all 233 scored meetings identical); it only corrects live reads.
+
 **Deliberately not used:** FRBSF USMPD, Bauer–Swanson and Gürkaynak–Sack–Swanson. They are
 free and excellent, and they publish the *change* in the futures rate across a window
 bracketing the announcement — measured after the decision is known. That would be the
@@ -240,6 +260,7 @@ engine/          the model. Python, no dependencies
   model.py       ordered logit (proportional odds)
   backtest.py    walk-forward validation and baselines
   horizon.py     model vs futures by days-to-meeting; sets the market handoff
+  watch.py       CME watch: the priced path, meeting by meeting, FedWatch-style
   cli.py         front door
 web/             Next.js dashboard — calibration, baselines, attribution
 ```

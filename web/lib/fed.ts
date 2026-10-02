@@ -267,9 +267,10 @@ async function runCli<T>(repo: string, args: string[], timeoutMs: number): Promi
  * instead of silently rendering someone else's numbers.
  */
 function snapshotVerb<T>(args: string[]): T | null {
-  const snap = snapshot as { forecast?: unknown; path?: unknown };
+  const snap = snapshot as { forecast?: unknown; path?: unknown; watch?: unknown };
   if (args[0] === "predict") return (snap.forecast as T | undefined) ?? null;
   if (args[0] === "path") return (snap.path as T | undefined) ?? null;
+  if (args[0] === "watch") return (snap.watch as T | undefined) ?? null;
   return null;
 }
 
@@ -429,4 +430,91 @@ const pathMemo = memo(
 
 export function getFedPath(): Promise<FedPath> {
   return pathMemo();
+}
+
+/* ── the CME watch ────────────────────────────────────────────────────────── */
+
+export interface WatchRange {
+  lower: number;
+  upper: number;
+  label: string;
+  change_bp: number;
+  p: number;
+}
+
+/** One meeting of `cli.py watch` (engine/watch.py). */
+export interface WatchRow {
+  meeting: string;
+  sep: boolean;
+  effective: string;
+  days_away: number;
+  contract: string;
+  contract_price: number;
+  quote_date: string;
+  stale: boolean;
+  method: string;
+  next_month_has_meeting: boolean;
+  rate_in: number;
+  implied_effr: number;
+  move_bp: number;
+  cum_bp: number;
+  implied_target_upper: number;
+  this_meeting: { p_cut: number; p_hold: number; p_hike: number };
+  vs_today: { p_lower: number; p_unchanged: number; p_higher: number };
+  ranges: WatchRange[];
+  most_likely: string;
+}
+
+export interface WatchCheck {
+  window: string;
+  meeting: string;
+  options_p_higher: number | null;
+  options_p_lower: number | null;
+  futures_p_higher: number;
+  futures_p_lower: number;
+}
+
+export interface Watch {
+  as_of: string;
+  current_target_upper: number | null;
+  current_range: string | null;
+  effr_start: number | null;
+  rows: WatchRow[];
+  unreached: string[];
+  note: string | null;
+  options_check: { report_date: string; source: string; licence: string; rows: WatchCheck[] } | null;
+}
+
+export interface FedWatch {
+  watch: Watch | null;
+  /** Null when the watch ran; a reason to render otherwise. */
+  missing: string | null;
+  source: "live" | "snapshot";
+}
+
+/**
+ * `cli.py watch` — what the futures strip prices at each upcoming meeting, as a
+ * distribution over target ranges. The MARKET's path, read off a separate
+ * contract per meeting; unlike `path`, it is a rate path, the priced one.
+ *
+ * ~15s warm (it parses the full futures archive), so it streams behind its own
+ * Suspense boundary like the path does.
+ */
+async function loadWatch(): Promise<FedWatch> {
+  const watch = await runCli<Watch>(repoRoot(), ["watch", "--json", "--n=8"], 120_000);
+  const source = engineUnreachable ? "snapshot" : "live";
+  if (!watch || !Array.isArray(watch.rows) || watch.rows.length === 0) {
+    return {
+      watch: null,
+      missing: watch?.note ?? "The CME watch did not run. `python cli.py watch` in engine/.",
+      source,
+    };
+  }
+  return { watch, missing: null, source };
+}
+
+const watchMemo = memo(TTL_MS, loadWatch, (w) => w.watch !== null);
+
+export function getFedWatch(): Promise<FedWatch> {
+  return watchMemo();
 }

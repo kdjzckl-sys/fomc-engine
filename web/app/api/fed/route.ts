@@ -4,8 +4,9 @@
  * Thin wrapper over lib/fed, which shells out to
  * `engine/cli.py predict --json` and reads the backtest artifacts.
  *
- * Takes one optional flag and nothing else: `?path=1` adds the conditional-path
- * rows. Nothing user-controlled reaches the shell — the meeting is whatever is
+ * Takes two optional flags and nothing else: `?path=1` adds the conditional-path
+ * rows, `?watch=1` adds the CME watch (the futures-priced path, engine/watch.py).
+ * Nothing user-controlled reaches the shell — the meeting is whatever is
  * next on the scraped calendar, and the path's meeting count is a constant the
  * loader clamps. There is no injection surface here.
  *
@@ -23,22 +24,29 @@
  * Class C — no model call, no spend.
  */
 import { NextResponse } from "next/server";
-import { getFed, getFedPath } from "@/lib/fed";
+import { getFed, getFedPath, getFedWatch } from "@/lib/fed";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
-  const wantPath = new URL(req.url).searchParams.get("path") === "1";
+  const params = new URL(req.url).searchParams;
+  const wantPath = params.get("path") === "1";
+  const wantWatch = params.get("watch") === "1";
 
-  const [bundle, path] = await Promise.all([
+  const [bundle, path, watch] = await Promise.all([
     getFed(),
     wantPath ? getFedPath() : Promise.resolve(null),
+    wantWatch ? getFedWatch() : Promise.resolve(null),
   ]);
+
+  const body = watch
+    ? { ...bundle, watch: watch.watch, watch_missing: watch.missing }
+    : bundle;
 
   return NextResponse.json(
     path
       ? {
-          ...bundle,
+          ...body,
           path: path.rows,
           path_missing: path.missing,
           // Stated in the payload, not just in the docs: a machine consumer
@@ -48,6 +56,6 @@ export async function GET(req: Request) {
             "pressure already in the data, not a rate-path forecast, and must not be quoted " +
             "as one.",
         }
-      : bundle,
+      : body,
   );
 }

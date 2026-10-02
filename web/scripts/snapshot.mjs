@@ -67,9 +67,10 @@ function assertNoSecrets(text) {
   }
 }
 
-const [forecast, pathRows, backtest, current, decisions, tuning] = await Promise.all([
+const [forecast, pathRows, watch, backtest, current, decisions, tuning] = await Promise.all([
   cli(["predict", "--json"], 120_000),
   cli(["path", "--json", "--n=5"], 180_000),
+  cli(["watch", "--json", "--n=8"], 180_000),
   readJson("engine/models/backtest.json"),
   readJson("engine/models/current.json"),
   readJson("engine/data/decisions.json"),
@@ -90,6 +91,7 @@ const snapshot = {
   },
   forecast,
   path: pathRows,
+  watch,
   artifacts: {
     "engine/models/backtest.json": backtest,
     "engine/models/current.json": current,
@@ -109,4 +111,5 @@ console.log(`snapshot -> data/snapshot.json  (${kb} KB)`);
 console.log(`  meeting     ${forecast?.meeting}  (${forecast?.days_away} days away)`);
 console.log(`  expected    ${forecast?.expected_bp?.toFixed?.(1)} bp`);
 console.log(`  path rows   ${pathRows?.length ?? 0}`);
+console.log(`  watch rows  ${watch?.rows?.length ?? 0}  (unreached: ${watch?.unreached?.length ?? 0})`);
 console.log(`  history     ${snapshot.artifacts["engine/data/decisions.json"].decisions.length}`);

@@ -149,8 +149,10 @@ PROXY = "100 * (DGS3MO - EFFR), 10-day average -- the spread the engine used bef
 # amplifies noise too much; roll to the next month's contract instead.
 MIN_DAYS_AFTER = 7
 # How many months of listed contracts to pull from Yahoo so the LIVE forecast
-# has a strip rather than only the front month.
-LIVE_STRIP_MONTHS = 8
+# has a strip rather than only the front month. Thirteen reaches the eighth
+# meeting out plus the month after it, which is what watch.py's FedWatch table
+# needs when a meeting lands too late in its month to weight.
+LIVE_STRIP_MONTHS = 13
 
 NS_XML = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 
@@ -298,11 +300,18 @@ def _yahoo_rows(refresh: bool = False) -> list[tuple[str, str, float]]:
     month. The per-contract symbols are what let a *live* forecast reach a
     meeting in a later month; they only exist while a contract is listed, so
     they add depth to the recent past and nothing to the distant past.
-    """
-    rows = [(d, _ym(d), 100.0 - p) for d, p in _yahoo_closes(YAHOO_FRONT, refresh)]
 
+    PER-CONTRACT ROWS COME FIRST, and the current month's own contract (k=0) is
+    pulled too. `ZQ=F` is a continuous series and Yahoo rolls it early: on
+    2026-10-02 it printed 96.065, which is the November contract to the tick,
+    while ZQV26 (October) printed 96.1175. Stamped as October and written first,
+    that roll leaked November's price into October. Where the contract itself is
+    quoted it is the definition of the delivery month, so it wins; the front
+    series still fills every day before per-contract history exists.
+    """
+    rows: list[tuple[str, str, float]] = []
     today = datetime.date.today()
-    for k in range(1, LIVE_STRIP_MONTHS + 1):
+    for k in range(0, LIVE_STRIP_MONTHS + 1):
         t = (today.year * 12 + today.month - 1) + k
         y, m = t // 12, t % 12 + 1
         sym = "ZQ%s%02d.CBT" % (MONTH_CODE[m - 1], y % 100)
@@ -313,6 +322,7 @@ def _yahoo_rows(refresh: bool = False) -> list[tuple[str, str, float]]:
             continue          # a contract not yet listed is normal, not an error
         for d, p in closes:
             rows.append((d, ym, 100.0 - p))
+    rows += [(d, _ym(d), 100.0 - p) for d, p in _yahoo_closes(YAHOO_FRONT, refresh)]
     return rows
 
 
@@ -324,6 +334,51 @@ def _mpt_rows(refresh: bool = False) -> list[dict]:
     if not refresh and path.exists() and time.time() - path.stat().st_mtime < CACHE_TTL_S:
         return json.loads(path.read_text(encoding="utf-8"))
 
+    by_day = _mpt_by_day(refresh)
+    out = []
+    for day in sorted(by_day):
+        ahead = sorted(w for w in by_day[day] if w[0] > day)
+        if not ahead:
+            continue
+        _window, rec = ahead[0]      # the nearest window still in front of us
+        out.append({"date": day,
+                    "p_cut": rec.get("Prob: cut"),
+                    "p_hike": rec.get("Prob: hike")})
+    CACHE.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(out), encoding="utf-8")
+    return out
+
+
+def mpt_windows(when: str, refresh: bool = False) -> dict | None:
+    """Every option window the tracker published, from its last report visible at `when`.
+
+    {"date": report day, "windows": [{"window", "p_cut", "p_hike"}, ...]}.
+    p_cut / p_hike are P(the target range at that date sits below / above the
+    range prevailing on the report day). watch.py sets these beside the futures
+    tree as an independent read: options carry the tails a two-outcome split of
+    the futures mean cannot. Same `pub = D + 1` stamp as the feature columns.
+    """
+    path = CACHE / "mpt.windows.json"
+    if not refresh and path.exists() and time.time() - path.stat().st_mtime < CACHE_TTL_S:
+        by_day = json.loads(path.read_text(encoding="utf-8"))
+    else:
+        by_day = {d: [{"window": w, "p_cut": r.get("Prob: cut"), "p_hike": r.get("Prob: hike")}
+                      for w, r in sorted(ws) if w > d]
+                  for d, ws in _mpt_by_day(refresh).items()}
+        # Only the recent tail is ever read live; keep the cache small.
+        keep = sorted(by_day)[-30:]
+        by_day = {d: by_day[d] for d in keep}
+        CACHE.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(by_day), encoding="utf-8")
+    vis = [d for d in by_day if fred.shift_days(d, 1) <= when]
+    if not vis:
+        return None
+    day = max(vis)
+    return {"date": day, "windows": by_day[day]}
+
+
+def _mpt_by_day(refresh: bool = False) -> dict[str, list]:
+    """{report day: [(window date, {field: probability}), ...]} off the workbook."""
     blob = _cached_bytes("mpt_histdata.xlsx", MPT_URLS, refresh, timeout=300,
                         magic=b"PK")
     z = zipfile.ZipFile(io.BytesIO(blob))
@@ -381,19 +436,7 @@ def _mpt_rows(refresh: bool = False) -> list[dict]:
         except (TypeError, ValueError):
             continue
         by_day.setdefault(day, []).append((window, rec))
-
-    out = []
-    for day in sorted(by_day):
-        ahead = sorted(w for w in by_day[day] if w[0] > day)
-        if not ahead:
-            continue
-        _window, rec = ahead[0]      # the nearest window still in front of us
-        out.append({"date": day,
-                    "p_cut": rec.get("Prob: cut"),
-                    "p_hike": rec.get("Prob: hike")})
-    CACHE.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(out), encoding="utf-8")
-    return out
+    return by_day
 
 
 # -- assembly ---------------------------------------------------------------
@@ -437,8 +480,9 @@ def load(refresh: bool = False) -> dict:
 
     # One quote per (delivery month, day). Sources can legitimately overlap --
     # once the calendar rolls into a delivery month, the front series and that
-    # month's own listed contract are the same contract quoted twice. First
-    # writer wins, which is NS, then the front series, then per-contract.
+    # month's own listed contract are the same contract quoted twice, except
+    # when Yahoo has rolled the front early (see _yahoo_rows). First writer
+    # wins, which is NS, then per-contract, then the front series.
     by_month: dict[str, dict] = {}
     for day, ym, rate in rows:
         by_month.setdefault(ym, {}).setdefault(day, rate)

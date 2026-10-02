@@ -11,6 +11,7 @@ import {
 import { Caveat, Metric, Panel, Section, Stat, fx, pct, pp } from "./ui";
 import { Reliability } from "./reliability";
 import { PathSection, PathSkeleton } from "./path";
+import { WatchSection, WatchSkeleton } from "./watch";
 
 export const dynamic = "force-dynamic";
 
@@ -156,6 +157,11 @@ export default async function FedPage() {
 
               {f.handoff?.measured ? <HorizonTable h={f.handoff} /> : null}
             </section>
+
+            {/* ── the CME watch: the priced path (streams; ~15s of Python) ── */}
+            <Suspense fallback={<WatchSkeleton />}>
+              <WatchSection />
+            </Suspense>
 
             {/* ── the record, always next to its baselines ─────────────── */}
             {d.score ? <Scorecard s={d.score} moves={d.moves} /> : null}

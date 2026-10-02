@@ -11,6 +11,9 @@
     python cli.py horizon        model vs futures by days-to-meeting; sets the
                                  market handoff the headline follows (~8 min)
     python cli.py path [--n=4]   the next N meetings, conditional on today's data
+    python cli.py watch [--n=8]  CME watch: what the futures strip prices at each
+                                 of the next N meetings, FedWatch-style, as a
+                                 distribution over target ranges
     python cli.py coefficients   the fitted reaction function, signed
     python cli.py provenance     where vintage data starts, per series
     python cli.py history [--n=20]  recent meetings and what the Fed did
@@ -155,6 +158,11 @@ def main() -> int:
                       % (f["meeting"], 100 * f["p_cut"], 100 * f["p_hold"],
                          100 * f["p_hike"], f["expected_bp"],
                          f["implied_target_upper"] or 0))
+
+    elif cmd == "watch":
+        import watch
+        w = watch.read(int(_flag("n", 8)), refresh=refresh)
+        print(json.dumps(w, indent=1) if as_json else watch.render(w))
 
     elif cmd == "horizon":
         import horizon

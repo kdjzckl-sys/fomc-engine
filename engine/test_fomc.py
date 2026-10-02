@@ -279,6 +279,39 @@ def main():
         finally:
             predict.market_read = orig
 
+    print("\ncme watch")
+    import watch
+    check("split: 9.5bp is 38% +25 / 62% unchanged",
+          all(abs(watch.split(9.5).get(k, 0) - v) < 1e-9 for k, v in {0: 0.62, 25: 0.38}.items()))
+    check("split: -30bp is 80% -25 / 20% -50",
+          all(abs(watch.split(-30).get(k, 0) - v) < 1e-9 for k, v in {-25: 0.8, -50: 0.2}.items()))
+    check("split: an exact 25bp multiple is one outcome", watch.split(25.0) == {25: 1.0})
+    t = watch.chain(watch.chain({0: 1.0}, watch.split(9.5)), watch.split(20.4))
+    check("chained tree sums to 1 and its mean is the sum of the steps",
+          abs(sum(t.values()) - 1) < 1e-9
+          and abs(sum(k * p for k, p in t.items()) - 29.9) < 1e-6)
+    w = watch.read(3)
+    if w["rows"]:
+        import predict
+        mk = predict.market_read(calendar_fed.next_meeting())
+        r0 = w["rows"][0]
+        # Row one IS the scored market read, never a second derivation of it.
+        # (The probabilities agree inside +-25bp; past it market_read caps at
+        # 100% while the watch splits across +25/+50, which is the point of it.
+        # split() rounds the move to 1e-6bp, hence the tolerance.)
+        check("watch row one reproduces the scored market read",
+              mk["exp_move_bp"] is not None
+              and abs(r0["move_bp"] - mk["exp_move_bp"]) < 1e-9
+              and (abs(mk["exp_move_bp"]) > 25
+                   or abs(r0["this_meeting"]["p_hike"] - mk["p_hike"]) < 1e-6),
+              "%s vs %s" % (r0["move_bp"], mk["exp_move_bp"]))
+        check("every watch row's ranges sum to 1",
+              all(abs(sum(x["p"] for x in r["ranges"]) - 1) < 1e-9 for r in w["rows"]))
+        check("watch reads a separate contract per meeting where it can",
+              len({r["contract"] for r in w["rows"]}) == len(w["rows"]))
+    else:
+        check("watch reaches the next meeting", False, str(w.get("note") or w["unreached"]))
+
     print("\n%s" % ("ALL PASS" if not FAIL else "FAILED: " + ", ".join(FAIL)))
     return 1 if FAIL else 0
 

@@ -285,6 +285,13 @@ scored on **today's** data. It is "what would the Fed do at that meeting if
 nothing changed", a read on how much pressure is already in the data. It is not
 a rate-path forecast and must not be quoted as one.
 
+`cli.py watch` is the opposite object: no model at all, the **market's** path.
+Each upcoming meeting is read off its own ZQ contract through the FedWatch
+arithmetic, split across the two bracketing 25bp outcomes, and chained into a
+target-range distribution per meeting, with the Atlanta Fed's option-implied
+read beside it as a cross-check on the tails. Row one equals the scored
+market read exactly. Method and caveats: `watch.py`'s docstring.
+
 ---
 
 ## What it cannot do
@@ -325,6 +332,7 @@ model.py         ordered logit, pure Python
 backtest.py      walk-forward validation and baselines
 tune.py          hyperparameter sweep + feature-block ablation
 predict.py       train the production model; forecast with attribution
+watch.py         CME watch: the futures-priced path across the next 8 meetings
 cli.py           front door
 cmp_window.py    score a narrowed window without publishing it (comparison only)
 data/            cached series, calendar, labelled decisions, design matrix
