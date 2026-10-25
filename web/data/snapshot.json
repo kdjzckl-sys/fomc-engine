@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-24T01:01:21.683Z",
+  "generated_at": "2026-10-25T17:36:03.418Z",
   "engine": {
-    "trained": "2026-10-24T00:57:37",
+    "trained": "2026-10-25T17:32:53",
     "train_to": "2026-09-16",
     "n_meetings": 293
   },
@@ -9,21 +9,21 @@
     "meeting": "2026-10-28",
     "start": "2026-10-27",
     "sep": false,
-    "days_away": 4,
+    "days_away": 3,
     "current_target_upper": 4,
     "probs": {
-      "cut50+": 0.000001293650619891647,
-      "cut25": 0.000037017811083492166,
-      "hold": 0.17726777526076987,
-      "hike25": 0.7981833130170868,
-      "hike50+": 0.02451060026043994
+      "cut50+": 0.0000012589227406608206,
+      "cut25": 0.00003602410990663391,
+      "hold": 0.17333424695706182,
+      "hike25": 0.8014587524589789,
+      "hike50+": 0.02516971755131192
     },
-    "p_cut": 0.00003831146170338381,
-    "p_hold": 0.17726777526076987,
-    "p_hike": 0.8226939132775267,
-    "expected_bp": 21.485489043263836,
-    "implied_target_upper": 4.215,
-    "latent": 5.2742477181851575,
+    "p_cut": 0.00003728303264729473,
+    "p_hold": 0.17333424695706182,
+    "p_hike": 0.8266284700102908,
+    "expected_bp": 21.60859687301251,
+    "implied_target_upper": 4.216,
+    "latent": 5.3014595249109515,
     "drivers_tightening": [
       {
         "feature": "mkt_3m",
@@ -190,27 +190,27 @@
       "credit_chg": -0.1485714285714288,
       "vix": 17.251111111111115,
       "nfci": -0.496,
-      "equity_3m": 4.550203381368512,
-      "equity_drawdown": -5.764624424227771,
+      "equity_3m": 4.335064121709653,
+      "equity_drawdown": -5.9585382405509595,
       "oil_yoy": 67.3618811805988,
-      "ff_exp_move_bp": 2.0001525878906357,
+      "ff_exp_move_bp": 2.4998779296875107,
       "ff_p_cut": 0.02377777777777778,
       "ff_p_hike": 0.9381777777777778,
       "is_sep": 0,
       "days_since_prev": 42
     },
     "model": {
-      "trained": "2026-10-24T00:57:37",
+      "trained": "2026-10-25T17:32:53",
       "n_meetings": 293,
       "train_to": "2026-09-16"
     },
-    "as_of": "2026-10-24T01:01:20",
+    "as_of": "2026-10-25T17:36:02",
     "market": {
-      "exp_move_bp": 2.0001525878906357,
+      "exp_move_bp": 2.4998779296875107,
       "source": "futures",
       "p_cut": 0,
-      "p_hold": 0.9199938964843746,
-      "p_hike": 0.08000610351562543,
+      "p_hold": 0.9000048828124996,
+      "p_hike": 0.09999511718750043,
       "call": "hold",
       "options_implied": {
         "p_cut": 0.02377777777777778,
@@ -220,8 +220,8 @@
     },
     "model_call": "hike",
     "handoff": {
-      "horizon_days": 3,
-      "days_to_meeting": 4,
+      "horizon_days": 2,
+      "days_to_meeting": 3,
       "handoff_days": 28,
       "handoff_date": "2026-09-29",
       "headline_source": "market",
@@ -333,21 +333,21 @@
       "meeting": "2026-10-28",
       "start": "2026-10-27",
       "sep": false,
-      "days_away": 4,
+      "days_away": 3,
       "current_target_upper": 4,
       "probs": {
-        "cut50+": 0.000001293650619891647,
-        "cut25": 0.000037017811083492166,
-        "hold": 0.17726777526076987,
-        "hike25": 0.7981833130170868,
-        "hike50+": 0.02451060026043994
+        "cut50+": 0.0000012589227406608206,
+        "cut25": 0.00003602410990663391,
+        "hold": 0.17333424695706182,
+        "hike25": 0.8014587524589789,
+        "hike50+": 0.02516971755131192
       },
-      "p_cut": 0.00003831146170338381,
-      "p_hold": 0.17726777526076987,
-      "p_hike": 0.8226939132775267,
-      "expected_bp": 21.485489043263836,
-      "implied_target_upper": 4.215,
-      "latent": 5.2742477181851575,
+      "p_cut": 0.00003728303264729473,
+      "p_hold": 0.17333424695706182,
+      "p_hike": 0.8266284700102908,
+      "expected_bp": 21.60859687301251,
+      "implied_target_upper": 4.216,
+      "latent": 5.3014595249109515,
       "drivers_tightening": [
         {
           "feature": "mkt_3m",
@@ -514,27 +514,27 @@
         "credit_chg": -0.1485714285714288,
         "vix": 17.251111111111115,
         "nfci": -0.496,
-        "equity_3m": 4.550203381368512,
-        "equity_drawdown": -5.764624424227771,
+        "equity_3m": 4.335064121709653,
+        "equity_drawdown": -5.9585382405509595,
         "oil_yoy": 67.3618811805988,
-        "ff_exp_move_bp": 2.0001525878906357,
+        "ff_exp_move_bp": 2.4998779296875107,
         "ff_p_cut": 0.02377777777777778,
         "ff_p_hike": 0.9381777777777778,
         "is_sep": 0,
         "days_since_prev": 42
       },
       "model": {
-        "trained": "2026-10-24T00:57:37",
+        "trained": "2026-10-25T17:32:53",
         "n_meetings": 293,
         "train_to": "2026-09-16"
       },
-      "as_of": "2026-10-24T01:01:20",
+      "as_of": "2026-10-25T17:36:01",
       "market": {
-        "exp_move_bp": 2.0001525878906357,
+        "exp_move_bp": 2.4998779296875107,
         "source": "futures",
         "p_cut": 0,
-        "p_hold": 0.9199938964843746,
-        "p_hike": 0.08000610351562543,
+        "p_hold": 0.9000048828124996,
+        "p_hike": 0.09999511718750043,
         "call": "hold",
         "options_implied": {
           "p_cut": 0.02377777777777778,
@@ -544,8 +544,8 @@
       },
       "model_call": "hike",
       "handoff": {
-        "horizon_days": 3,
-        "days_to_meeting": 4,
+        "horizon_days": 2,
+        "days_to_meeting": 3,
         "handoff_days": 28,
         "handoff_date": "2026-09-29",
         "headline_source": "market",
@@ -657,27 +657,27 @@
       "meeting": "2026-12-09",
       "start": "2026-12-08",
       "sep": true,
-      "days_away": 46,
+      "days_away": 45,
       "current_target_upper": 4,
       "probs": {
-        "cut50+": 3.3809995688372233e-7,
-        "cut25": 0.00000967500368856279,
-        "hold": 0.053313022996098004,
-        "hike25": 0.858969267556248,
-        "hike50+": 0.08770769634400855
+        "cut50+": 3.2476927811376303e-7,
+        "cut25": 0.000009293539204084613,
+        "hold": 0.051318899590622497,
+        "hike25": 0.857691219203236,
+        "hike50+": 0.09098026289765937
       },
-      "p_cut": 0.000010013103645446511,
-      "p_hold": 0.053313022996098004,
-      "p_hike": 0.9466769639002566,
-      "expected_bp": 26.955699704067214,
-      "implied_target_upper": 4.27,
-      "latent": 6.6161305300685145,
+      "p_cut": 0.000009618308482198377,
+      "p_hold": 0.051318899590622497,
+      "p_hike": 0.9486714821008954,
+      "expected_bp": 27.128294274624626,
+      "implied_target_upper": 4.271,
+      "latent": 6.656357108862095,
       "drivers_tightening": [
         {
           "feature": "ff_exp_move_bp",
-          "value": 21.841425115411894,
-          "z": 0.8782529005840393,
-          "contribution": 1.2404956447694002,
+          "value": 22.54558355158025,
+          "z": 0.9097717022912005,
+          "contribution": 1.2850146394918578,
           "beta": 1.4124583521949874
         },
         {
@@ -838,27 +838,27 @@
         "credit_chg": -0.12500000000000044,
         "vix": 17.251111111111115,
         "nfci": -0.496,
-        "equity_3m": -1.5614231034604131,
-        "equity_drawdown": -5.764624424227771,
+        "equity_3m": -1.7639861006660928,
+        "equity_drawdown": -5.9585382405509595,
         "oil_yoy": 69.2151743203809,
-        "ff_exp_move_bp": 21.841425115411894,
+        "ff_exp_move_bp": 22.54558355158025,
         "ff_p_cut": 0.02377777777777778,
         "ff_p_hike": 0.9381777777777778,
         "is_sep": 1,
         "days_since_prev": 84
       },
       "model": {
-        "trained": "2026-10-24T00:57:37",
+        "trained": "2026-10-25T17:32:53",
         "n_meetings": 293,
         "train_to": "2026-09-16"
       },
-      "as_of": "2026-10-24T01:01:20",
+      "as_of": "2026-10-25T17:36:02",
       "market": {
-        "exp_move_bp": 21.841425115411894,
+        "exp_move_bp": 22.54558355158025,
         "source": "futures",
         "p_cut": 0,
-        "p_hold": 0.12634299538352423,
-        "p_hike": 0.8736570046164758,
+        "p_hold": 0.09817665793678998,
+        "p_hike": 0.90182334206321,
         "call": "hike",
         "options_implied": {
           "p_cut": 0.02377777777777778,
@@ -868,8 +868,8 @@
       },
       "model_call": "hike",
       "handoff": {
-        "horizon_days": 45,
-        "days_to_meeting": 46,
+        "horizon_days": 44,
+        "days_to_meeting": 45,
         "handoff_days": 28,
         "handoff_date": "2026-11-10",
         "headline_source": "model",
@@ -968,27 +968,27 @@
       "meeting": "2027-01-27",
       "start": "2027-01-26",
       "sep": false,
-      "days_away": 95,
+      "days_away": 94,
       "current_target_upper": 4,
       "probs": {
-        "cut50+": 1.4982120762102514e-7,
-        "cut25": 0.000004287278922873443,
-        "hold": 0.02434754537646191,
-        "hike25": 0.7973690871067258,
-        "hike50+": 0.17827893041668175
+        "cut50+": 1.5507069794368707e-7,
+        "cut25": 0.000004437497481467741,
+        "hold": 0.025179155589026357,
+        "hike25": 0.8015266358695223,
+        "hike50+": 0.17328961597327186
       },
-      "p_cut": 0.000004437100130494468,
-      "p_hold": 0.02434754537646191,
-      "p_hike": 0.9756480175234076,
-      "expected_bp": 31.076543782912207,
-      "implied_target_upper": 4.311,
-      "latent": 7.430029666569259,
+      "p_cut": 0.000004592568179411428,
+      "p_hold": 0.025179155589026357,
+      "p_hike": 0.9748162518427942,
+      "expected_bp": 30.868646265711888,
+      "implied_target_upper": 4.309,
+      "latent": 7.395591166590637,
       "drivers_tightening": [
         {
           "feature": "ff_exp_move_bp",
-          "value": 30.000030517578136,
-          "z": 1.2434398424278654,
-          "contribution": 1.7563069908892575,
+          "value": 29.50030517578126,
+          "z": 1.2210716605711713,
+          "contribution": 1.7247128656023536,
           "beta": 1.4124583521949874
         },
         {
@@ -1150,22 +1150,22 @@
         "vix": 17.251111111111115,
         "nfci": -0.496,
         "equity_3m": 0,
-        "equity_drawdown": -5.764624424227771,
+        "equity_drawdown": -5.9585382405509595,
         "oil_yoy": 67.4585442220297,
-        "ff_exp_move_bp": 30.000030517578136,
+        "ff_exp_move_bp": 29.50030517578126,
         "ff_p_cut": 0.02377777777777778,
         "ff_p_hike": 0.9381777777777778,
         "is_sep": 0,
         "days_since_prev": 133
       },
       "model": {
-        "trained": "2026-10-24T00:57:37",
+        "trained": "2026-10-25T17:32:53",
         "n_meetings": 293,
         "train_to": "2026-09-16"
       },
-      "as_of": "2026-10-24T01:01:20",
+      "as_of": "2026-10-25T17:36:02",
       "market": {
-        "exp_move_bp": 30.000030517578136,
+        "exp_move_bp": 29.50030517578126,
         "source": "futures",
         "p_cut": 0,
         "p_hold": 0,
@@ -1179,8 +1179,8 @@
       },
       "model_call": "hike",
       "handoff": {
-        "horizon_days": 94,
-        "days_to_meeting": 95,
+        "horizon_days": 93,
+        "days_to_meeting": 94,
         "handoff_days": 28,
         "handoff_date": "2026-12-29",
         "headline_source": "model",
@@ -1279,21 +1279,21 @@
       "meeting": "2027-03-17",
       "start": "2027-03-16",
       "sep": true,
-      "days_away": 144,
+      "days_away": 143,
       "current_target_upper": 4,
       "probs": {
-        "cut50+": 9.98903268514144e-9,
-        "cut25": 2.858470260955069e-7,
-        "hold": 0.0016610846605581995,
-        "hike25": 0.2334081929106346,
-        "hike50+": 0.7649304265927483
+        "cut50+": 1.0017485682931428e-8,
+        "cut25": 2.866612393076544e-7,
+        "hold": 0.001665808249044327,
+        "hike25": 0.23391530616516168,
+        "hike50+": 0.764418588907069
       },
-      "p_cut": 2.958360587806483e-7,
-      "p_hold": 0.0016610846605581995,
-      "p_hike": 0.998338619503383,
-      "expected_bp": 53.643348714322435,
+      "p_cut": 2.966787249905858e-7,
+      "p_hold": 0.001665808249044327,
+      "p_hike": 0.9983338950722307,
+      "expected_bp": 53.62403666819702,
       "implied_target_upper": 4.536,
-      "latent": 10.137984680709977,
+      "latent": 10.13514030601826,
       "drivers_tightening": [
         {
           "feature": "ff_exp_move_bp",
@@ -1461,7 +1461,7 @@
         "vix": 17.251111111111115,
         "nfci": -0.496,
         "equity_3m": 0,
-        "equity_drawdown": -5.764624424227771,
+        "equity_drawdown": -5.9585382405509595,
         "oil_yoy": 22.25194527793317,
         "ff_exp_move_bp": 79.71381269182487,
         "ff_p_cut": 0.02377777777777778,
@@ -1470,11 +1470,11 @@
         "days_since_prev": 182
       },
       "model": {
-        "trained": "2026-10-24T00:57:37",
+        "trained": "2026-10-25T17:32:53",
         "n_meetings": 293,
         "train_to": "2026-09-16"
       },
-      "as_of": "2026-10-24T01:01:21",
+      "as_of": "2026-10-25T17:36:03",
       "market": {
         "exp_move_bp": 79.71381269182487,
         "source": "futures",
@@ -1490,8 +1490,8 @@
       },
       "model_call": "hike",
       "handoff": {
-        "horizon_days": 143,
-        "days_to_meeting": 144,
+        "horizon_days": 142,
+        "days_to_meeting": 143,
         "handoff_days": 28,
         "handoff_date": "2027-02-16",
         "headline_source": "model",
@@ -1590,27 +1590,27 @@
       "meeting": "2027-04-28",
       "start": "2027-04-27",
       "sep": false,
-      "days_away": 186,
+      "days_away": 185,
       "current_target_upper": 4,
       "probs": {
-        "cut50+": 7.09902627378017e-8,
-        "cut25": 0.000002031459848465444,
-        "hold": 0.011686442230476369,
-        "hike25": 0.6742397269340041,
-        "hike50+": 0.3140717283854083
+        "cut50+": 7.347764575633021e-8,
+        "cut25": 0.0000021026387332739336,
+        "hold": 0.012090963419524797,
+        "hike25": 0.6812063146106457,
+        "hike50+": 0.3067005458534504
       },
-      "p_cut": 0.0000021024501112032457,
-      "p_hold": 0.011686442230476369,
-      "p_hike": 0.9883114553194124,
-      "expected_bp": 36.48542097405049,
-      "implied_target_upper": 4.365,
-      "latent": 8.176929656268737,
+      "p_cut": 0.0000021761163790302637,
+      "p_hold": 0.012090963419524797,
+      "p_hike": 0.9879068604640961,
+      "expected_bp": 36.1988848227856,
+      "implied_target_upper": 4.362,
+      "latent": 8.142491156290113,
       "drivers_tightening": [
         {
           "feature": "ff_exp_move_bp",
-          "value": 52.499877929687514,
-          "z": 2.2505544243145317,
-          "contribution": 3.178814393692442,
+          "value": 52.00015258789064,
+          "z": 2.2281862424578374,
+          "contribution": 3.1472202684055377,
           "beta": 1.4124583521949874
         },
         {
@@ -1772,22 +1772,22 @@
         "vix": 17.251111111111115,
         "nfci": -0.496,
         "equity_3m": 0,
-        "equity_drawdown": -5.764624424227771,
+        "equity_drawdown": -5.9585382405509595,
         "oil_yoy": 5.034474923753196,
-        "ff_exp_move_bp": 52.499877929687514,
+        "ff_exp_move_bp": 52.00015258789064,
         "ff_p_cut": 0.02377777777777778,
         "ff_p_hike": 0.9381777777777778,
         "is_sep": 0,
         "days_since_prev": 224
       },
       "model": {
-        "trained": "2026-10-24T00:57:37",
+        "trained": "2026-10-25T17:32:53",
         "n_meetings": 293,
         "train_to": "2026-09-16"
       },
-      "as_of": "2026-10-24T01:01:21",
+      "as_of": "2026-10-25T17:36:03",
       "market": {
-        "exp_move_bp": 52.499877929687514,
+        "exp_move_bp": 52.00015258789064,
         "source": "futures",
         "p_cut": 0,
         "p_hold": 0,
@@ -1801,8 +1801,8 @@
       },
       "model_call": "hike",
       "handoff": {
-        "horizon_days": 185,
-        "days_to_meeting": 186,
+        "horizon_days": 184,
+        "days_to_meeting": 185,
         "handoff_days": 28,
         "handoff_date": "2027-03-30",
         "headline_source": "model",
@@ -1899,7 +1899,7 @@
     }
   ],
   "watch": {
-    "as_of": "2026-10-24",
+    "as_of": "2026-10-25",
     "current_target_upper": 4,
     "current_range": "375-400",
     "effr_start": 3.88,
@@ -1911,35 +1911,35 @@
         "start": "2026-10-27",
         "sep": false,
         "effective": "2026-10-29",
-        "days_away": 4,
+        "days_away": 3,
         "contract": "ZQX26",
         "contract_month": "2026-11",
-        "contract_price": 96.1,
-        "contract_rate": 3.9000015258789062,
+        "contract_price": 96.095,
+        "contract_rate": 3.904998779296875,
         "quote_date": "2026-10-23",
         "stale": false,
         "method": "next-month contract, outright",
         "next_month_has_meeting": false,
         "rate_in": 3.88,
         "rate_in_source": "EFFR, 10-day median",
-        "implied_effr": 3.9000015258789062,
-        "move_bp": 2.0001525878906357,
-        "cum_bp": 2.0001525878906357,
-        "tree_mean_bp": 2.000153,
-        "implied_target_upper": 4.02,
+        "implied_effr": 3.904998779296875,
+        "move_bp": 2.4998779296875107,
+        "cum_bp": 2.4998779296875107,
+        "tree_mean_bp": 2.499878,
+        "implied_target_upper": 4.025,
         "this_meeting": {
           "p_cut": 0,
-          "p_hold": 0.91999388,
-          "p_hike": 0.08000612,
+          "p_hold": 0.90000488,
+          "p_hike": 0.09999511999999999,
           "outcomes": {
-            "0": 0.91999388,
-            "25": 0.08000612
+            "0": 0.90000488,
+            "25": 0.09999511999999999
           }
         },
         "vs_today": {
           "p_lower": 0,
-          "p_unchanged": 0.91999388,
-          "p_higher": 0.08000612
+          "p_unchanged": 0.90000488,
+          "p_higher": 0.09999511999999999
         },
         "ranges": [
           {
@@ -1947,14 +1947,14 @@
             "upper": 4.25,
             "label": "400-425",
             "change_bp": 25,
-            "p": 0.08000612
+            "p": 0.09999511999999999
           },
           {
             "lower": 3.75,
             "upper": 4,
             "label": "375-400",
             "change_bp": 0,
-            "p": 0.91999388
+            "p": 0.90000488
           }
         ],
         "most_likely": "375-400"
@@ -1964,22 +1964,22 @@
         "start": "2026-12-08",
         "sep": true,
         "effective": "2026-12-10",
-        "days_away": 46,
+        "days_away": 45,
         "contract": "ZQZ26",
         "contract_month": "2026-12",
-        "contract_price": 95.965,
-        "contract_rate": 4.035003662109375,
+        "contract_price": 95.96,
+        "contract_rate": 4.040000915527344,
         "quote_date": "2026-10-23",
         "stale": false,
         "method": "meeting-month weighting",
         "next_month_has_meeting": false,
-        "rate_in": 3.9000015258789062,
+        "rate_in": 3.904998779296875,
         "rate_in_source": "anchor month 2026-11 (ZQX26)",
-        "implied_effr": 4.090231808749112,
+        "implied_effr": 4.095229062167081,
         "move_bp": 19.023028287020605,
-        "cum_bp": 21.02318087491124,
-        "tree_mean_bp": 21.023180999999997,
-        "implied_target_upper": 4.2102,
+        "cum_bp": 21.522906216708115,
+        "tree_mean_bp": 21.522906,
+        "implied_target_upper": 4.2152,
         "this_meeting": {
           "p_cut": 0,
           "p_hold": 0.23907888,
@@ -1991,8 +1991,8 @@
         },
         "vs_today": {
           "p_lower": 0,
-          "p_unchanged": 0.21995110643725435,
-          "p_higher": 0.7800488935627456
+          "p_unchanged": 0.21517215870493445,
+          "p_higher": 0.7848278412950657
         },
         "ranges": [
           {
@@ -2000,21 +2000,21 @@
             "upper": 4.5,
             "label": "425-450",
             "change_bp": 50,
-            "p": 0.060878346437254385
+            "p": 0.0760883987049344
           },
           {
             "lower": 4,
             "upper": 4.25,
             "label": "400-425",
             "change_bp": 25,
-            "p": 0.7191705471254912
+            "p": 0.7087394425901312
           },
           {
             "lower": 3.75,
             "upper": 4,
             "label": "375-400",
             "change_bp": 0,
-            "p": 0.21995110643725435
+            "p": 0.21517215870493445
           }
         ],
         "most_likely": "400-425"
@@ -2024,35 +2024,35 @@
         "start": "2027-01-26",
         "sep": false,
         "effective": "2027-01-28",
-        "days_away": 95,
+        "days_away": 94,
         "contract": "ZQG27",
         "contract_month": "2027-02",
-        "contract_price": 95.82,
-        "contract_rate": 4.180000305175781,
+        "contract_price": 95.825,
+        "contract_rate": 4.1750030517578125,
         "quote_date": "2026-10-23",
         "stale": false,
         "method": "next-month contract, outright",
         "next_month_has_meeting": false,
-        "rate_in": 4.090231808749112,
+        "rate_in": 4.095229062167081,
         "rate_in_source": "previous meeting's implied rate",
-        "implied_effr": 4.180000305175781,
-        "move_bp": 8.976849642666895,
-        "cum_bp": 30.000030517578136,
-        "tree_mean_bp": 30.000031,
-        "implied_target_upper": 4.3,
+        "implied_effr": 4.1750030517578125,
+        "move_bp": 7.977398959073145,
+        "cum_bp": 29.50030517578126,
+        "tree_mean_bp": 29.500305,
+        "implied_target_upper": 4.295,
         "this_meeting": {
           "p_cut": 0,
-          "p_hold": 0.640926,
-          "p_hike": 0.359074,
+          "p_hold": 0.6809040399999999,
+          "p_hike": 0.31909596,
           "outcomes": {
-            "0": 0.640926,
-            "25": 0.359074
+            "0": 0.6809040399999999,
+            "25": 0.31909596
           }
         },
         "vs_today": {
           "p_lower": 0,
-          "p_unchanged": 0.1409723828444037,
-          "p_higher": 0.8590276171555963
+          "p_unchanged": 0.146511592157711,
+          "p_higher": 0.853488407842289
         },
         "ranges": [
           {
@@ -2060,28 +2060,28 @@
             "upper": 4.75,
             "label": "450-475",
             "change_bp": 75,
-            "p": 0.02185983136861068
+            "p": 0.0242795006296138
           },
           {
             "lower": 4.25,
             "upper": 4.5,
             "label": "425-450",
             "change_bp": 50,
-            "p": 0.2972539601071823
+            "p": 0.2779647908984834
           },
           {
             "lower": 4,
             "upper": 4.25,
             "label": "400-425",
             "change_bp": 25,
-            "p": 0.5399138256798033
+            "p": 0.5512441163141918
           },
           {
             "lower": 3.75,
             "upper": 4,
             "label": "375-400",
             "change_bp": 0,
-            "p": 0.1409723828444037
+            "p": 0.146511592157711
           }
         ],
         "most_likely": "400-425"
@@ -2091,7 +2091,7 @@
         "start": "2027-03-16",
         "sep": true,
         "effective": "2027-03-18",
-        "days_away": 144,
+        "days_away": 143,
         "contract": "ZQH27",
         "contract_month": "2027-03",
         "contract_price": 95.76,
@@ -2100,26 +2100,26 @@
         "stale": false,
         "method": "meeting-month weighting",
         "next_month_has_meeting": false,
-        "rate_in": 4.180000305175781,
+        "rate_in": 4.1750030517578125,
         "rate_in_source": "anchor month 2027-02 (ZQG27)",
-        "implied_effr": 4.312852042061942,
-        "move_bp": 13.285173688616059,
-        "cum_bp": 43.285204206194194,
-        "tree_mean_bp": 43.285205,
-        "implied_target_upper": 4.4329,
+        "implied_effr": 4.318920135498048,
+        "move_bp": 14.391708374023526,
+        "cum_bp": 43.89201354980479,
+        "tree_mean_bp": 43.892013000000006,
+        "implied_target_upper": 4.4389,
         "this_meeting": {
           "p_cut": 0,
-          "p_hold": 0.46859304,
-          "p_hike": 0.53140696,
+          "p_hold": 0.42433168,
+          "p_hike": 0.57566832,
           "outcomes": {
-            "0": 0.46859304,
-            "25": 0.53140696
+            "0": 0.42433168,
+            "25": 0.57566832
           }
         },
         "vs_today": {
           "p_lower": 0,
-          "p_unchanged": 0.06605867743310298,
-          "p_higher": 0.9339413225668971
+          "p_unchanged": 0.062169510039756334,
+          "p_higher": 0.9378304899602437
         },
         "ranges": [
           {
@@ -2127,35 +2127,35 @@
             "upper": 5,
             "label": "475-500",
             "change_bp": 100,
-            "p": 0.01161646653370604
+            "p": 0.01397693933788872
           },
           {
             "lower": 4.5,
             "upper": 4.75,
             "label": "450-475",
             "change_bp": 75,
-            "p": 0.16820618812342367
+            "p": 0.17031808548740632
           },
           {
             "lower": 4.25,
             "upper": 4.5,
             "label": "425-450",
             "change_bp": 50,
-            "p": 0.42620510158513747
+            "p": 0.4352830410512776
           },
           {
             "lower": 4,
             "upper": 4.25,
             "label": "400-425",
             "change_bp": 25,
-            "p": 0.3279135663246298
+            "p": 0.3182524240836711
           },
           {
             "lower": 3.75,
             "upper": 4,
             "label": "375-400",
             "change_bp": 0,
-            "p": 0.06605867743310298
+            "p": 0.062169510039756334
           }
         ],
         "most_likely": "425-450"
@@ -2165,35 +2165,35 @@
         "start": "2027-04-27",
         "sep": false,
         "effective": "2027-04-29",
-        "days_away": 186,
+        "days_away": 185,
         "contract": "ZQK27",
         "contract_month": "2027-05",
-        "contract_price": 95.595,
-        "contract_rate": 4.404998779296875,
+        "contract_price": 95.6,
+        "contract_rate": 4.400001525878906,
         "quote_date": "2026-10-23",
         "stale": false,
         "method": "next-month contract, outright",
         "next_month_has_meeting": false,
-        "rate_in": 4.312852042061942,
+        "rate_in": 4.318920135498048,
         "rate_in_source": "previous meeting's implied rate",
-        "implied_effr": 4.404998779296875,
-        "move_bp": 9.214673723493316,
-        "cum_bp": 52.499877929687514,
-        "tree_mean_bp": 52.49987900000001,
-        "implied_target_upper": 4.525,
+        "implied_effr": 4.400001525878906,
+        "move_bp": 8.108139038085849,
+        "cum_bp": 52.00015258789064,
+        "tree_mean_bp": 52.00015200000001,
+        "implied_target_upper": 4.52,
         "this_meeting": {
           "p_cut": 0,
-          "p_hold": 0.63141304,
-          "p_hike": 0.36858696,
+          "p_hold": 0.6756744400000001,
+          "p_hike": 0.32432555999999996,
           "outcomes": {
-            "0": 0.63141304,
-            "25": 0.36858696
+            "0": 0.6756744400000001,
+            "25": 0.32432555999999996
           }
         },
         "vs_today": {
           "p_lower": 0,
-          "p_unchanged": 0.04171031033641495,
-          "p_higher": 0.9582896896635852
+          "p_unchanged": 0.04200634888118675,
+          "p_higher": 0.9579936511188133
         },
         "ranges": [
           {
@@ -2201,42 +2201,42 @@
             "upper": 5.25,
             "label": "500-525",
             "change_bp": 125,
-            "p": 0.004281678085600448
+            "p": 0.004533078677846788
           },
           {
             "lower": 4.75,
             "upper": 5,
             "label": "475-500",
             "change_bp": 100,
-            "p": 0.06933339598170644
+            "p": 0.06468236911387286
           },
           {
             "lower": 4.5,
             "upper": 4.75,
             "label": "450-475",
             "change_bp": 75,
-            "p": 0.2633012233195799
+            "p": 0.256252993081034
           },
           {
             "lower": 4.25,
             "upper": 4.5,
             "label": "425-450",
             "change_bp": 50,
-            "p": 0.3899761234097342
+            "p": 0.39732702066611314
           },
           {
             "lower": 4,
             "upper": 4.25,
             "label": "400-425",
             "change_bp": 25,
-            "p": 0.23139726886696418
+            "p": 0.2351981895799466
           },
           {
             "lower": 3.75,
             "upper": 4,
             "label": "375-400",
             "change_bp": 0,
-            "p": 0.04171031033641495
+            "p": 0.04200634888118675
           }
         ],
         "most_likely": "425-450"
@@ -2246,35 +2246,35 @@
         "start": "2027-06-08",
         "sep": true,
         "effective": "2027-06-10",
-        "days_away": 228,
+        "days_away": 227,
         "contract": "ZQM27",
         "contract_month": "2027-06",
-        "contract_price": 95.53,
-        "contract_rate": 4.470001220703125,
+        "contract_price": 95.535,
+        "contract_rate": 4.464996337890625,
         "quote_date": "2026-10-23",
         "stale": false,
         "method": "meeting-month weighting",
         "next_month_has_meeting": false,
-        "rate_in": 4.404998779296875,
+        "rate_in": 4.400001525878906,
         "rate_in_source": "anchor month 2027-05 (ZQK27)",
-        "implied_effr": 4.497859409877232,
-        "move_bp": 9.286063058035676,
-        "cum_bp": 61.78594098772319,
-        "tree_mean_bp": 61.78594199999999,
-        "implied_target_upper": 4.6179,
+        "implied_effr": 4.492851257324219,
+        "move_bp": 9.28497314453125,
+        "cum_bp": 61.28512573242189,
+        "tree_mean_bp": 61.285124999999994,
+        "implied_target_upper": 4.6129,
         "this_meeting": {
           "p_cut": 0,
-          "p_hold": 0.62855748,
-          "p_hike": 0.37144252,
+          "p_hold": 0.6286010799999999,
+          "p_hike": 0.37139892,
           "outcomes": {
-            "0": 0.62855748,
-            "25": 0.37144252
+            "0": 0.6286010799999999,
+            "25": 0.37139892
           }
         },
         "vs_today": {
           "p_lower": 0,
-          "p_unchanged": 0.02621732755507493,
-          "p_higher": 0.9737826724449249
+          "p_unchanged": 0.026405236273570772,
+          "p_higher": 0.9735947637264291
         },
         "ranges": [
           {
@@ -2282,49 +2282,49 @@
             "upper": 5.5,
             "label": "525-550",
             "change_bp": 150,
-            "p": 0.0015903972979442059
+            "p": 0.0016835805252273246
           },
           {
             "lower": 5,
             "upper": 5.25,
             "label": "500-525",
             "change_bp": 125,
-            "p": 0.028444652111259152
+            "p": 0.026872460184553193
           },
           {
             "lower": 4.75,
             "upper": 5,
             "label": "475-500",
             "change_bp": 100,
-            "p": 0.141381294567011
+            "p": 0.1358314919590026
           },
           {
             "lower": 4.5,
             "upper": 4.75,
             "label": "450-475",
             "change_bp": 75,
-            "p": 0.31035366742981496
+            "p": 0.3086477345661825
           },
           {
             "lower": 4.25,
             "upper": 4.5,
             "label": "425-450",
             "change_bp": 50,
-            "p": 0.33107319405965424
+            "p": 0.3371125478998484
           },
           {
             "lower": 4,
             "upper": 4.25,
             "label": "400-425",
             "change_bp": 25,
-            "p": 0.16093946697924144
+            "p": 0.1634469485916151
           },
           {
             "lower": 3.75,
             "upper": 4,
             "label": "375-400",
             "change_bp": 0,
-            "p": 0.02621732755507493
+            "p": 0.026405236273570772
           }
         ],
         "most_likely": "425-450"
@@ -2334,7 +2334,7 @@
         "start": "2027-07-27",
         "sep": false,
         "effective": "2027-07-29",
-        "days_away": 277,
+        "days_away": 276,
         "contract": "ZQQ27",
         "contract_month": "2027-08",
         "contract_price": 95.475,
@@ -2343,26 +2343,26 @@
         "stale": false,
         "method": "next-month contract, outright",
         "next_month_has_meeting": false,
-        "rate_in": 4.497859409877232,
+        "rate_in": 4.492851257324219,
         "rate_in_source": "previous meeting's implied rate",
         "implied_effr": 4.525001525878906,
-        "move_bp": 2.714211600167449,
+        "move_bp": 3.21502685546875,
         "cum_bp": 64.50015258789064,
-        "tree_mean_bp": 64.500154,
+        "tree_mean_bp": 64.50015200000001,
         "implied_target_upper": 4.645,
         "this_meeting": {
           "p_cut": 0,
-          "p_hold": 0.89143152,
-          "p_hike": 0.10856848,
+          "p_hold": 0.87139892,
+          "p_hike": 0.12860108,
           "outcomes": {
-            "0": 0.89143152,
-            "25": 0.10856848
+            "0": 0.87139892,
+            "25": 0.12860108
           }
         },
         "vs_today": {
           "p_lower": 0,
-          "p_unchanged": 0.023370952152758327,
-          "p_higher": 0.9766290478472418
+          "p_unchanged": 0.0230094943711344,
+          "p_higher": 0.9769905056288656
         },
         "ranges": [
           {
@@ -2370,66 +2370,66 @@
             "upper": 5.75,
             "label": "550-575",
             "change_bp": 175,
-            "p": 0.00017266701723390955
+            "p": 0.00021651027381120122
           },
           {
             "lower": 5.25,
             "upper": 5.5,
             "label": "525-550",
             "change_bp": 150,
-            "p": 0.004505922924558493
+            "p": 0.004922897653406665
           },
           {
             "lower": 5,
             "upper": 5.25,
             "label": "500-525",
             "change_bp": 125,
-            "p": 0.040706011718983595
+            "p": 0.040884709346501714
           },
           {
             "lower": 4.75,
             "upper": 5,
             "label": "475-500",
             "change_bp": 100,
-            "p": 0.1597263682507189
+            "p": 0.15805584739982798
           },
           {
             "lower": 4.5,
             "upper": 4.75,
             "label": "450-475",
             "change_bp": 75,
-            "p": 0.31260315494233615
+            "p": 0.3123083403028904
           },
           {
             "lower": 4.25,
             "upper": 4.5,
             "label": "425-450",
             "change_bp": 50,
-            "p": 0.312602033913799
+            "p": 0.3147789642699624
           },
           {
             "lower": 4,
             "upper": 4.25,
             "label": "400-425",
             "change_bp": 25,
-            "p": 0.14631288907961162
+            "p": 0.14582323638246533
           },
           {
             "lower": 3.75,
             "upper": 4,
             "label": "375-400",
             "change_bp": 0,
-            "p": 0.023370952152758327
+            "p": 0.0230094943711344
           }
         ],
-        "most_likely": "450-475"
+        "most_likely": "425-450"
       },
       {
         "meeting": "2027-09-15",
         "start": "2027-09-14",
         "sep": true,
         "effective": "2027-09-16",
-        "days_away": 326,
+        "days_away": 325,
         "contract": "ZQU27",
         "contract_month": "2027-09",
         "contract_price": 95.455,
@@ -2443,7 +2443,7 @@
         "implied_effr": 4.564994812011719,
         "move_bp": 3.99932861328125,
         "cum_bp": 68.49948120117189,
-        "tree_mean_bp": 68.49948299999998,
+        "tree_mean_bp": 68.49948099999999,
         "implied_target_upper": 4.685,
         "this_meeting": {
           "p_cut": 0,
@@ -2456,8 +2456,8 @@
         },
         "vs_today": {
           "p_lower": 0,
-          "p_unchanged": 0.019632227084672774,
-          "p_higher": 0.9803677729153271
+          "p_unchanged": 0.019328592846581814,
+          "p_higher": 0.9806714071534183
         },
         "ranges": [
           {
@@ -2465,63 +2465,63 @@
             "upper": 6,
             "label": "575-600",
             "change_bp": 200,
-            "p": 0.00002762208837468297
+            "p": 0.0000346358326740431
           },
           {
             "lower": 5.5,
             "upper": 5.75,
             "label": "550-575",
             "change_bp": 175,
-            "p": 0.0008658716578172903
+            "p": 0.000969405935109207
           },
           {
             "lower": 5.25,
             "upper": 5.5,
             "label": "525-550",
             "change_bp": 150,
-            "p": 0.010296965521283266
+            "p": 0.01067582230927603
           },
           {
             "lower": 5,
             "upper": 5.25,
             "label": "500-525",
             "change_bp": 125,
-            "p": 0.059746074257691933
+            "p": 0.05962894656168856
           },
           {
             "lower": 4.75,
             "upper": 5,
             "label": "475-500",
             "change_bp": 100,
-            "p": 0.18418255090842284
+            "p": 0.18273210612740842
           },
           {
             "lower": 4.5,
             "upper": 4.75,
             "label": "450-475",
             "change_bp": 75,
-            "p": 0.3126029756078586
+            "p": 0.3127035738260746
           },
           {
             "lower": 4.25,
             "upper": 4.5,
             "label": "425-450",
             "change_bp": 50,
-            "p": 0.28600023394097634
+            "p": 0.2877505825796994
           },
           {
             "lower": 4,
             "upper": 4.25,
             "label": "400-425",
             "change_bp": 25,
-            "p": 0.1266454789329022
+            "p": 0.12617633398148798
           },
           {
             "lower": 3.75,
             "upper": 4,
             "label": "375-400",
             "change_bp": 0,
-            "p": 0.019632227084672774
+            "p": 0.019328592846581814
           }
         ],
         "most_likely": "450-475"
@@ -2539,36 +2539,36 @@
           "meeting": "2026-12-09",
           "options_p_higher": 0.8686,
           "options_p_lower": 0.045,
-          "futures_p_higher": 0.7800488935627456,
+          "futures_p_higher": 0.7848278412950657,
           "futures_p_lower": 0,
-          "gap_higher": -0.08855110643725439
+          "gap_higher": -0.08377215870493437
         },
         {
           "window": "2027-03-17",
           "meeting": "2027-01-27",
           "options_p_higher": 0.8236,
           "options_p_lower": 0.1104,
-          "futures_p_higher": 0.8590276171555963,
+          "futures_p_higher": 0.853488407842289,
           "futures_p_lower": 0,
-          "gap_higher": 0.03542761715559628
+          "gap_higher": 0.029888407842288967
         },
         {
           "window": "2027-06-16",
           "meeting": "2027-06-09",
           "options_p_higher": 0.7846,
           "options_p_lower": 0.1496,
-          "futures_p_higher": 0.9737826724449249,
+          "futures_p_higher": 0.9735947637264291,
           "futures_p_lower": 0,
-          "gap_higher": 0.18918267244492493
+          "gap_higher": 0.1889947637264291
         },
         {
           "window": "2027-09-15",
           "meeting": "2027-07-28",
           "options_p_higher": 0.7542,
           "options_p_lower": 0.18359999999999999,
-          "futures_p_higher": 0.9766290478472418,
+          "futures_p_higher": 0.9769905056288656,
           "futures_p_lower": 0,
-          "gap_higher": 0.22242904784724182
+          "gap_higher": 0.2227905056288656
         }
       ]
     }
@@ -3064,7 +3064,7 @@
         ]
       },
       "meta": {
-        "trained": "2026-10-24T00:57:37",
+        "trained": "2026-10-25T17:32:53",
         "n_meetings": 293,
         "train_from": "1990-02-07",
         "train_to": "2026-09-16",
