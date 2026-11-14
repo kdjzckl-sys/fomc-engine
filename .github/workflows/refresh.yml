@@ -51,7 +51,11 @@ jobs:
           key: upstream-${{ github.run_id }}
           restore-keys: upstream-
 
-      - name: Engine — fetch, build, train, backtest
+      # `all` rebuilds the horizon record (~8 min) between the backtest and the
+      # forecast. It has to: the tests below hold horizon.json's 1-day row equal
+      # to the scorecard's futures column, and a record left at the old sample
+      # failed every refresh after the 2026-10-28 meeting.
+      - name: Engine — fetch, build, train, backtest, horizon
         working-directory: engine
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
@@ -75,7 +79,8 @@ jobs:
           git config user.email "fomc-refresh@users.noreply.github.com"
           git add engine/data/decisions.json engine/data/fomc_meetings.json \
                   engine/data/matrix.json engine/models/backtest.json \
-                  engine/models/current.json web/data/snapshot.json
+                  engine/models/current.json engine/models/horizon.json \
+                  web/data/snapshot.json
           if git diff --cached --quiet; then
             echo "no change"; exit 0
           fi

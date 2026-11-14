@@ -10,7 +10,7 @@ and nothing is remembered wrong.
 
 ```bash
 cp .env.example .env          # free FRED key: fred.stlouisfed.org/docs/api/api_key.html
-cd engine && python cli.py all    # fetch → build → train → backtest → predict
+cd engine && python cli.py all    # fetch → build → train → backtest → horizon → predict
 ```
 
 No dependencies. The ordered logit is ~200 lines of pure Python; the xlsx parser is
@@ -95,12 +95,15 @@ scored at N days only if it was already the next meeting then.
 
 | days out | meetings | model | futures | on moves: model / futures | false alarms: model / futures |
 |---|---|---|---|---|---|
-| 1 | 196 | 84.7% | **90.8%** | 64.6% / 83.1% | 5.3% / 5.3% |
-| 7 | 187 | 84.0% | **95.7%** | 62.3% / 95.1% | 5.6% / 4.0% |
-| 14 | 164 | 86.6% | 88.4% | 62.0% / 86.0% | 2.6% / 10.5% |
-| 21 | 132 | 84.8% | 87.1% | 57.9% / 81.6% | 4.3% / 10.6% |
-| 28 | 130 | 85.4% | 86.2% | 55.6% / 91.7% | 3.2% / 16.0% |
-| 42 | 67 | 83.6% | 83.6% | 50.0% / 77.8% | 4.1% / 14.3% |
+| 1 | 197 | 84.3% | **90.9%** | 64.6% / 83.1% | 6.1% / 5.3% |
+| 7 | 188 | 83.5% | **95.7%** | 62.3% / 95.1% | 6.3% / 3.9% |
+| 14 | 165 | 86.1% | 88.5% | 62.0% / 86.0% | 3.5% / 10.4% |
+| 21 | 132 | 84.8% | 87.9% | 59.5% / 83.8% | 5.3% / 10.5% |
+| 28 | 130 | 85.4% | 86.9% | 57.1% / 94.3% | 4.2% / 15.8% |
+| 42 | 66 | 84.8% | 83.3% | 52.9% / 76.5% | 4.1% / 14.3% |
+
+Through the 2026-10-28 meeting (rebuilt 2026-11-13). The daily refresh rewrites
+`engine/models/horizon.json`; this table is the snapshot of it at that date.
 
 The 1-day row reproduces the scorecard exactly, which is the check that the harness is
 the backtest and not a cousin of it. The rule was written before the table: the market
@@ -114,11 +117,13 @@ flips the headline. With no strip reading for the meeting, the headline stays on
 model and says the feed is missing.
 
 **Read the table, not just the flag.** The market's edge is decisive inside a week.
-From 14 to 28 days out it is one to three meetings, bought with three to five times the
+From 14 to 28 days out it is two to four meetings, bought with two to four times the
 model's false alarms on holds. The option-implied `ff_p_cut` / `ff_p_hike` ride along
 but are not this meeting's odds; they cover the nearest SOFR-option window. The horizon
-run takes ~8 minutes and is not in the daily refresh: rerun it after `cli.py all` when
-the sample or the model changes.
+run takes ~8 minutes and runs inside `cli.py all`, so the daily refresh rebuilds it with
+the scorecard. It used to be a manual step "after the sample changes", but the sample
+changes at every meeting: the first refresh after 2026-10-28 scored 197 meetings
+against a record frozen at 196, the self-test caught it, and nothing published for 17 days.
 
 ---
 

@@ -14,7 +14,7 @@ Nothing is hand-typed, so nothing rots silently and nothing is remembered wrong.
 ## What it does
 
 ```
-python cli.py all          # fetch -> build -> train -> backtest -> predict
+python cli.py all          # fetch -> build -> train -> backtest -> horizon -> predict
 python cli.py predict      # the next scheduled meeting
 python cli.py backtest     # walk-forward validation (the only honest score)
 python cli.py tune         # does macro beat what the market already priced?

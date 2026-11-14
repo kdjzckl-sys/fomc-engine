@@ -17,7 +17,8 @@
     python cli.py coefficients   the fitted reaction function, signed
     python cli.py provenance     where vintage data starts, per series
     python cli.py history [--n=20]  recent meetings and what the Fed did
-    python cli.py all            fetch -> build -> train -> backtest -> predict
+    python cli.py all            fetch -> build -> train -> backtest -> horizon
+                                 -> predict
 
     --json         machine-readable output (used by the /fed dashboard route)
     --no-futures   drop the fed funds futures block back to the old
@@ -139,6 +140,30 @@ def main() -> int:
                       " NARROWED window. Re-run without --start to restore the"
                       " full-history score.")
 
+    # THE HORIZON RECORD IS REBUILT INSIDE `all`, BETWEEN THE SCORECARD AND THE
+    # FORECAST. It used to be a separate ~8 minute step the README said to rerun
+    # "when the sample changes" -- and the sample changes at every meeting. The
+    # self-test holds the 1-day row equal to the scorecard's futures column, so
+    # the first refresh after the 2026-10-28 meeting scored 197 meetings against
+    # a horizon.json frozen at 196 (built 2026-09-30) and every daily refresh
+    # failed from then on. It runs before predict because predict reads its
+    # handoff, and it takes the backtest's own hyperparameters, because a
+    # 1-day row fitted differently from the scorecard is a cousin of the
+    # backtest, not the backtest.
+    if cmd in ("horizon", "all"):
+        import horizon
+        r = horizon.run(min_train=int(_flag("min-train", 60)),
+                        l2=float(_flag("l2", 2.0)),
+                        half_life=float(_flag("half-life", 12.0)),
+                        epochs=int(_flag("epochs", 400)),
+                        verbose=not as_json)
+        horizon.OUT.parent.mkdir(parents=True, exist_ok=True)
+        horizon.OUT.write_text(json.dumps(r, indent=1), encoding="utf-8")
+        if cmd == "horizon" and as_json:
+            print(json.dumps(r, indent=1))
+        elif not as_json:
+            print("  written: %s" % horizon.OUT)
+
     if cmd in ("predict", "all"):
         import predict
         f = predict.forecast(refresh=refresh)
@@ -163,13 +188,6 @@ def main() -> int:
         import watch
         w = watch.read(int(_flag("n", 8)), refresh=refresh)
         print(json.dumps(w, indent=1) if as_json else watch.render(w))
-
-    elif cmd == "horizon":
-        import horizon
-        r = horizon.run(epochs=int(_flag("epochs", 400)), verbose=not as_json)
-        horizon.OUT.parent.mkdir(parents=True, exist_ok=True)
-        horizon.OUT.write_text(json.dumps(r, indent=1), encoding="utf-8")
-        print(json.dumps(r, indent=1) if as_json else "  written: %s" % horizon.OUT)
 
     elif cmd == "coefficients":
         import predict
