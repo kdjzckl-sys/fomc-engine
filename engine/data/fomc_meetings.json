@@ -1,5 +1,5 @@
 {
- "fetched": "2026-10-27T01:34:45",
+ "fetched": "2026-11-14T15:57:55",
  "source": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
  "meetings": [
   {
@@ -2554,7 +2554,7 @@
    "date": "2027-03-17",
    "start": "2027-03-16",
    "scheduled": true,
-   "sep": true,
+   "sep": false,
    "days": 2
   },
   {
@@ -2568,7 +2568,7 @@
    "date": "2027-06-09",
    "start": "2027-06-08",
    "scheduled": true,
-   "sep": true,
+   "sep": false,
    "days": 2
   },
   {
@@ -2582,7 +2582,7 @@
    "date": "2027-09-15",
    "start": "2027-09-14",
    "scheduled": true,
-   "sep": true,
+   "sep": false,
    "days": 2
   },
   {
@@ -2593,10 +2593,10 @@
    "days": 2
   },
   {
-   "date": "2027-12-08",
-   "start": "2027-12-07",
+   "date": "2027-11-17",
+   "start": "2027-11-16",
    "scheduled": true,
-   "sep": true,
+   "sep": false,
    "days": 2
   }
  ]

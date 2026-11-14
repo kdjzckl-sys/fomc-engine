@@ -1,6 +1,6 @@
 {
- "built": "2026-10-27T01:35:34",
- "n": 360,
+ "built": "2026-11-14T15:58:34",
+ "n": 361,
  "decisions": [
   {
    "date": "1990-02-07",
@@ -4680,6 +4680,19 @@
    "delta_bp": 25.0,
    "label": 1,
    "label_name": "hike25",
+   "zlb": false
+  },
+  {
+   "date": "2026-10-28",
+   "start": "2026-10-27",
+   "scheduled": true,
+   "sep": false,
+   "days": 2,
+   "target_before": 4.0,
+   "target_after": 4.0,
+   "delta_bp": 0.0,
+   "label": 0,
+   "label_name": "hold",
    "zlb": false
   }
  ]
