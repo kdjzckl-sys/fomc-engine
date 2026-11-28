@@ -1,5 +1,5 @@
 {
- "built": "2026-11-27T04:32:14",
+ "built": "2026-11-28T04:12:18",
  "rule": "market takes the headline at horizons where, on the same meetings, it called direction more often than the model; handoff_days is the longest horizon out to which that holds at every measured horizon",
  "band_bp": 12.5,
  "horizons": [
